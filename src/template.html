@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!--
+  NEMA IQ Analyzer v/*VERSION*/ - offline analysis of the NEMA NU 2 PET image-quality test.
+  Copyright (c) 2026 The NEMA IQ Analyzer authors. Released under the MIT License (see LICENSE in the source repository).
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. Not a medical device.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEMA IQ Analyzer</title>
+<style id="appCss">
+  .btn.small { padding: 3px 9px; font-size: 12px; margin-left: 6px; } #profInfo, #refInfo, #limInfo, #baseInfo { margin-top: 3px; }
+  .custom { margin-top: 6px; display: grid; gap: 4px; } .custom .k2 { display: inline-block; width: 120px; color: #444; } .custom input { width: 330px; }
+  .reconpick { margin: 6px 0; } .reconpick select { margin-left: 6px; }
+  [hidden] { display: none !important; }
+  :root { --blue: #1d4f91; --line: #d5dbe3; --bgc: #f3f5f8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: #1b1f24; background: var(--bgc); }
+  header.app { background: var(--blue); color: #fff; padding: 12px 22px; display: flex; align-items: baseline; gap: 18px; }
+  header.app h1 { margin: 0; font-size: 21px; font-weight: 600; }
+  header.app span { opacity: .85; font-size: 13px; }
+  main { max-width: 1320px; margin: 0 auto; padding: 16px; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin-bottom: 14px; }
+  .panel h2 { margin: 0 0 10px; font-size: 16px; color: var(--blue); }
+  .drop { border: 2px dashed #9fb3cc; border-radius: 6px; padding: 16px; text-align: center; background: #fafcff; }
+  .drop.over { background: #e8f0fb; border-color: var(--blue); }
+  .drop p { margin: 4px 0; }
+  .hint { font-size: 12px; color: #5a6470; }
+  .btn { display: inline-block; padding: 7px 14px; margin: 4px; border-radius: 4px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; font-size: 14px; }
+  .btn.secondary { background: #fff; color: var(--blue); }
+  .btn.primary { font-size: 15px; padding: 9px 26px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .form { display: grid; grid-template-columns: 250px 1fr; gap: 8px 14px; align-items: center; font-size: 14px; }
+  .form label.k { font-weight: 600; }
+  .form input[type=number], .form input[type=text], .form select { padding: 4px 6px; font-size: 14px; min-width: 220px; }
+  .stdopt { margin-right: 18px; }
+  #stdNote, #baseInfo { font-size: 12px; color: #5a6470; }
+  #prog { margin-top: 10px; }
+  .bar { height: 8px; background: #e4e8ee; border-radius: 4px; overflow: hidden; }
+  #barIn { height: 100%; width: 0; background: var(--blue); transition: width .15s; }
+  #progMsg { font-size: 13px; margin-top: 4px; color: #394350; }
+  #err { background: #fdecea; color: #a61b12; border: 1px solid #f3b8b1; padding: 8px 12px; border-radius: 4px; margin-top: 10px; }
+  pre#log { max-height: 220px; overflow: auto; font-size: 11.5px; background: #f7f8fa; padding: 8px; }
+  table.series { width: 100%; }
+  .toolbar { position: sticky; top: 0; z-index: 5; background: var(--bgc); padding: 8px 0; }
+  .toolbar button { padding: 7px 14px; margin-right: 6px; border: 1px solid var(--blue); background: #fff; color: var(--blue); border-radius: 4px; cursor: pointer; }
+  .toolbar button:first-child { background: var(--blue); color: #fff; }
+  footer.app { text-align: center; font-size: 11.5px; color: #6b7480; padding: 10px 0 24px; }
+  @media print { header.app, .panel, .toolbar, footer.app { display: none !important; } body { background: #fff; } main { padding: 0; max-width: none; } #p-report { display: block !important; } }
+</style>
+<style id="reportCss">
+  .page { box-sizing: border-box; width: 297mm; height: 209mm; padding: 7mm 9mm 6mm; margin: 0 auto 14px; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.18);
+          overflow: hidden; font-family: "Segoe UI", Arial, sans-serif; color: #1b1f24; font-size: 10.5px; page-break-after: always; break-after: page; }
+  .ptitle { display: flex; justify-content: space-between; align-items: baseline; }
+  .page h1 { font-size: 17px; margin: 0; } .page h1 span { font-weight: 400; font-size: 14px; }
+  .page h3 { font-size: 11.5px; margin: 7px 0 3px; color: #1d4f91; }
+  .verdict { font-size: 15px; font-weight: 700; } .verdict.ok { color: #13822b; } .verdict.bad { color: #c21b12; } .verdict.warn { color: #cc6a00; }
+  .hdr { font-family: Consolas, "Courier New", monospace; font-size: 9.6px; color: #333; margin: 3px 0 4px; line-height: 1.35; }
+  .note { font-size: 10.5px; padding: 3px 8px; border-radius: 3px; margin-bottom: 4px; }
+  .note.ok { background: #e9f6ec; color: #145c25; } .note.bad { background: #fff1e0; color: #8a4200; border: 1px solid #f2c48d; }
+  .grid3 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1.12fr); grid-template-rows: auto auto; gap: 4px 12px; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 6px 14px; }
+  .grid3.details { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.05fr); }
+  .page * { box-sizing: border-box; }
+  .cell { min-width: 0; }
+  table.res td, table.res th { white-space: nowrap; padding: 2px 3px; }
+  table.res th { white-space: normal; }
+  .cap { font-size: 10px; color: #333; margin-bottom: 2px; }
+  .leg i { font-style: normal; }
+  img.slice { width: 100%; max-height: 66mm; object-fit: contain; border: 1px solid #999; image-rendering: auto; }
+  img.coronal { width: 100%; max-height: 66mm; object-fit: contain; border: 1px solid #999; }
+  svg.chart { width: 100%; height: auto; }
+  table.t { border-collapse: collapse; width: 100%; font-size: 10.2px; }
+  table.t th, table.t td { border: 1px solid #cfd5dc; padding: 2px 4px; text-align: center; }
+  table.t th { background: #eef2f7; font-weight: 600; }
+  table.t.small { font-size: 9.6px; } table.t.tiny { font-size: 8.4px; } table.t.tiny td, table.t.tiny th { padding: 0 3px; }
+  table.t tr.sep td { border-top: 2px solid #7d8a99; }
+  table.kv { border-collapse: collapse; width: 100%; font-size: 9.8px; } table.kv td { padding: 1px 4px; border-bottom: 1px solid #e6e9ee; vertical-align: top; }
+  table.kv td:first-child { color: #555; white-space: nowrap; width: 34%; }
+  td.ok { color: #13822b; font-weight: 700; } td.bad { color: #c21b12; font-weight: 700; } td.warn { color: #cc6a00; font-weight: 700; } td.na { color: #777; }
+  td.hot { color: #d62728; } td.cold { color: #1f77b4; } .flag { color: #cc6a00; font-weight: 700; }
+  .small { font-size: 9.6px; color: #333; } .mt { margin-top: 4px; }
+  ul.warn { margin: 2px 0; padding-left: 16px; font-size: 9.6px; color: #7a3d00; } ul.warn li { margin-bottom: 2px; }
+  .twocol { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  body.standalone { background: #e9ecf0; padding: 12px 0; margin: 0; }
+  @page { size: A4 landscape; margin: 0; }
+  @media print { .page { margin: 0; box-shadow: none; } body.standalone { background: #fff; padding: 0; } }
+</style>
+</head>
+<body>
+<header class="app"><h1>NEMA IQ Analyzer</h1><span>PET image-quality phantom analysis · NEMA NU 2-2012 / NU 2-2018 · runs locally in the browser, no installation, no data leave this computer</span></header>
+<main>
+  <section class="panel" id="p-data">
+    <h2>1 · DICOM data</h2>
+    <div id="drop" class="drop">
+      <p>Drag the DICOM study folder here, or</p>
+      <label class="btn">Select DICOM folder…<input type="file" id="dirInput" webkitdirectory directory multiple hidden></label>
+      <label class="btn secondary">Select files…<input type="file" id="fileInput" multiple hidden></label>
+      <p class="hint">For security reasons a browser cannot open a typed path: click <i>Select DICOM folder</i> and navigate to the study folder
+        (the exported study folder). The folder may contain the PET replicates and the CT; sub-folders are read too.
+        Supported: uncompressed DICOM (Explicit/Implicit VR).</p>
+    </div>
+    <div id="seriesBox"></div>
+  </section>
+
+  <section class="panel" id="p-set">
+    <h2>2 · Analysis settings</h2>
+    <div class="form">
+      <label class="k">NEMA standard</label>
+      <div><label class="stdopt"><input type="radio" name="std" value="2018" checked> NEMA NU 2-2018</label>
+           <label class="stdopt"><input type="radio" name="std" value="2012"> NEMA NU 2-2012</label>
+           <div id="stdNote">All six spheres (10-37 mm) hot at the sphere:background ratio; lung-residual slices within 30 mm of the lung-insert ends are excluded.</div></div>
+      <label class="k">Sphere : background ratio (a<sub>H</sub>/a<sub>B</sub>)</label>
+      <div><input type="number" id="ratio" value="4.00" step="0.01" min="1.01"> <span class="hint">true activity-concentration ratio of the fill (nominal 4:1; enter the measured value if known)</span></div>
+      <label class="k">Scanner profile (optional)</label>
+      <div><select id="profSel"><option value="auto">Auto-detect from the DICOM header</option><option value="none">None</option></select>
+        <label class="btn secondary small">Load profile JSON…<input type="file" id="profFile" accept=".json" hidden></label>
+        <div id="profInfo" class="hint">Profiles identify the system and provide published reference values for comparison (never PASS/FAIL).</div></div>
+      <label class="k">Published reference</label>
+      <div><select id="refSel"><option value="auto">Automatic (profile entry for the selected standard)</option><option value="none">None</option></select>
+        <div id="refInfo" class="hint"></div></div>
+      <label class="k">Acceptance limits</label>
+      <div><select id="limSel"><option value="none">None (report results without PASS/FAIL)</option><option value="custom">Enter limits…</option><option value="file">Load limits JSON…</option></select>
+        <label id="limFileLbl" class="btn secondary small" hidden>Choose JSON…<input type="file" id="limFile" accept=".json" hidden></label>
+        <div id="customBox" class="custom" hidden>
+          <div><span class="k2">Name</span><input type="text" id="limName" placeholder="e.g. Manufacturer acceptance specification, system XYZ"></div>
+          <div><span class="k2">Contrast ≥ [%]</span><input type="text" id="limQ" placeholder="six values for 10, 13, 17, 22, 28, 37 mm (hot spheres)"></div>
+          <div><span class="k2">BV ≤ [%]</span><input type="text" id="limBV" placeholder="six values for 10, 13, 17, 22, 28, 37 mm"></div>
+          <div><span class="k2">Lung error ≤ [%]</span><input type="text" id="limLung" placeholder="one value (empty = no limit)"></div>
+          <div><span class="k2">Standard</span><select id="limStd"><option value="">any</option><option value="2018">NU 2-2018</option><option value="2012">NU 2-2012</option></select></div>
+          <div><span class="k2">Source</span><input type="text" id="limSrc" placeholder="document, table and revision the values come from"></div>
+          <div><button id="limSave" class="btn secondary small" type="button">Save these limits as JSON</button></div>
+          <span class="hint">Take the limits from the manufacturer's documentation or your acceptance protocol. Contrast limits refer to the sphere types of the edition chosen for the limits (NU 2-2012: 28/37 mm cold; NU 2-2018 or <i>any</i>: all hot).</span>
+        </div>
+        <div id="limInfo" class="hint"></div></div>
+      <label class="k">Background volume [mL]</label>
+      <div><input type="number" id="volMl" placeholder="from DICOM (tracer volume)" step="1"> <span class="hint">used only for the expected activity concentration</span></div>
+      <label class="k">Sphere ROI slice</label>
+      <div><select id="sliceSel"><option value="per-sphere">Central slice of each sphere (recommended; robust to phantom tilt)</option><option value="common">One common central slice</option></select></div>
+      <label class="k">Sphere type (hot / cold)</label>
+      <div><select id="typeSel"><option value="detected">As measured in the image; deviations from the standard are flagged (recommended)</option>
+        <option value="standard">As required by the selected standard</option></select></div>
+      <label class="k">Baseline (own system)</label>
+      <div><select id="baseSel"><option value="none">None</option><option value="file">Load baseline JSON…</option></select>
+        <label id="baseFileLbl" class="btn secondary small" hidden>Choose JSON…<input type="file" id="baseFile" accept=".json" hidden></label>
+        <div id="baseInfo" class="hint">A baseline is your own earlier result (e.g. acceptance test). Create one with "Save as baseline" after an analysis.</div></div>
+      <label class="k">Site / scanner</label><div><input type="text" id="site" placeholder="e.g. Hospital, PET/CT 1"></div>
+      <label class="k">Operator</label><div><input type="text" id="operator" placeholder="initials"></div>
+    </div>
+    <p><button id="runBtn" class="btn primary" disabled>Analyse</button></p>
+    <div id="prog"><div class="bar"><div id="barIn"></div></div><div id="progMsg">Select the DICOM folder to begin.</div></div>
+    <div id="err" hidden></div>
+    <details><summary>Processing log</summary><pre id="log"></pre></details>
+  </section>
+
+  <section id="p-report" hidden>
+    <div class="toolbar"><button id="printBtn">Print / Save as PDF</button><button id="csvBtn">Results CSV</button><button id="lungBtn">Lung per-slice CSV</button>
+      <button id="jsonBtn">Full results JSON</button><button id="htmlBtn">Save report (HTML)</button><button id="baseBtn">Save as baseline (JSON)</button></div>
+    <div id="report"></div>
+  </section>
+</main>
+<footer class="app">NEMA IQ Analyzer v/*VERSION*/ · analysis per NEMA NU 2 Sec. 7 (image quality, accuracy of attenuation and scatter corrections) · for QA use by qualified medical physicists ·
+  <b>Not a medical device.</b> Provided without warranty; verify results and follow the manufacturer's test procedure and acceptance criteria.
+  · © 2026 The NEMA IQ Analyzer authors · MIT License</footer>
+<script>/*PROFILES*/</script>
+<script>/*CORE*/</script>
+<script>/*REPORT*/</script>
+<script>/*UI*/</script>
+</body>
+</html>

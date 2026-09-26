@@ -1,0 +1,49 @@
+{
+ "format": "nema-iq-baseline",
+ "version": 1,
+ "manufacturer": "<Manufacturer as in DICOM>",
+ "model": "<ManufacturerModelName as in DICOM>",
+ "acquisition_date": "YYYY-MM-DD",
+ "standard": "2018",
+ "source": "<e.g. acceptance test, analysis software>",
+ "_comment": "Create this file with 'Save as baseline (JSON)' after an analysis, or fill in by hand. The key under 'recons' must equal the reconstruction label shown in the report header. The baseline is ignored when 'model' does not match the scanner of the analysed study.",
+ "recons": {
+  "<recon label>": {
+   "contrast_mean": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "contrast_sd": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "bv_mean": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "bv_sd": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "lung_mean": null,
+   "lung_sd": null,
+   "n_replicates": 3
+  }
+ }
+}

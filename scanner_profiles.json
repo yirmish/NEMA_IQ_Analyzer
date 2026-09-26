@@ -1,0 +1,1474 @@
+{
+ "meta": {
+  "title": "NEMA IQ Analyzer - built-in scanner profiles",
+  "version": "2026-09-25",
+  "note": "Profiles identify the scanner and carry PUBLISHED NEMA NU 2 image-quality values for comparison. They are not acceptance limits. Every value is copied from the cited source (table/figure given); entries marked 'provisional' come from secondary sources. Published limit sets (where a manufacturer specification has been published) are offered only as an explicit choice.",
+  "research": "Compiled from peer-reviewed performance evaluations, public vendor documents and public DICOM metadata (TCIA)."
+ },
+ "profiles": [
+  {
+   "id": "siemens-biograph-mct-4r",
+   "manufacturer": "Siemens Healthineers",
+   "name": "Siemens Biograph mCT (TrueV, 4 rings, 22.1 cm)",
+   "match": {
+    "manufacturer": "siemens",
+    "model": "mCT(?!\\s*Flow)"
+   },
+   "afov_cm": 22.1,
+   "variant": "4 rings (TrueV)",
+   "tof_ps": 540,
+   "ring_diameter_cm": 84.2,
+   "dicom_model_names": [
+    "Biograph128_mCT",
+    "Biograph64_mCT",
+    "Biograph 64_mCT",
+    "Biograph40_mCT",
+    "Biograph20_mCT",
+    "Biograph64_mCT 4R"
+   ],
+   "notes": "Geometry: Karlberg 2016 (22.1 cm; Carlier 2020 lists 21.6 cm). A 3-ring (non-TrueV) mCT exists; its axial FOV was not found in a public source. Reference values are NU 2-2007 (IQ procedure equivalent to NU 2-2012 except scan time), contrast only.",
+   "protocol": null,
+   "references": [
+    {
+     "id": "karlberg2016-psftof-4to1",
+     "label": "PSF+TOF 3i21s, 4 mm, 4:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 4.0,
+     "recon": "3D OSEM + PSF + TOF; 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.04 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 37.0,
+      "13": 66.0,
+      "17": 72.7,
+      "22": 77.3,
+      "28": 81.0,
+      "37": 85.3
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 3 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "karlberg2016-osem-4to1",
+     "label": "OSEM 3i24s, 4 mm, 4:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 4.0,
+     "recon": "3D OSEM (no PSF, no TOF); 3 it x 24 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.04 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 28.4,
+      "13": 50.8,
+      "17": 62.3,
+      "22": 70.9,
+      "28": 70.8,
+      "37": 76.2
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 3 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-psf-4to1",
+     "label": "PSF 3i21s, 4 mm, 4:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 4.0,
+     "recon": "3D OSEM + PSF (TrueX); 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.04 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 28.9,
+      "13": 57.5,
+      "17": 70.1,
+      "22": 74.4,
+      "28": 70.9,
+      "37": 76.4
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 3 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-tof-4to1",
+     "label": "TOF 3i21s, 4 mm, 4:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 4.0,
+     "recon": "3D OSEM + TOF; 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.04 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 31.0,
+      "13": 54.4,
+      "17": 64.6,
+      "22": 73.4,
+      "28": 80.3,
+      "37": 84.5
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 3 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-psftof-8to1",
+     "label": "PSF+TOF 3i21s, 4 mm, 8:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 8.0,
+     "recon": "3D OSEM + PSF + TOF; 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.39 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 48.2,
+      "13": 70.3,
+      "17": 74.3,
+      "22": 80.7,
+      "28": 80.1,
+      "37": 85.5
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 2 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-osem-8to1",
+     "label": "OSEM 3i24s, 4 mm, 8:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 8.0,
+     "recon": "3D OSEM (no PSF, no TOF); 3 it x 24 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.39 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 35.1,
+      "13": 56.7,
+      "17": 64.3,
+      "22": 74.2,
+      "28": 71.7,
+      "37": 77.6
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": 17.0,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 2 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-psf-8to1",
+     "label": "PSF 3i21s, 4 mm, 8:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 8.0,
+     "recon": "3D OSEM + PSF (TrueX); 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.39 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 41.4,
+      "13": 68.8,
+      "17": 72.5,
+      "22": 78.3,
+      "28": 71.3,
+      "37": 77.5
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 2 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "karlberg2016-tof-8to1",
+     "label": "TOF 3i21s, 4 mm, 8:1 (Karlberg 2016)",
+     "standard": "NEMA NU 2-2007 (IQ procedure equivalent to NU 2-2012 apart from emission scan time, per Rausch 2015 Discussion)",
+     "variant": "Biograph mCT with TrueV (4 rings, 22.1 cm AFOV), syngo MI.PET/CT 2012A",
+     "ratio": 8.0,
+     "recon": "3D OSEM + TOF; 3 it x 21 subsets; filter Gaussian 4 mm FWHM; matrix 400x400; voxel ~2 isotropic (paper states ~2 mm) mm",
+     "acquisition": "540 s per bed; 1 bed(s); 9 min single bed 'according to manufacturer's specifications'; background 5.39 kBq/mL at scan start; NEMA scatter phantom with 115 MBq line source next to the IQ phantom; analysed with Siemens NEMA image quality software (60 background ROIs, 5 planes)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 36.2,
+      "13": 57.1,
+      "17": 67.7,
+      "22": 76.7,
+      "28": 79.1,
+      "37": 84.9
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": 8.0,
+     "citation": "Karlberg AM, Sæther O, Eikenes L, Goa PE. Quantitative comparison of PET performance—Siemens Biograph mCT and mMR. EJNMMI Phys. 2016;3:5.",
+     "doi": "https://doi.org/10.1186/s40658-016-0142-7",
+     "table": "Table 2 (contrast); lung residual from Results text/Fig. 5",
+     "notes": "BV only plotted (Fig. 3), not tabulated -> null. Lung residual stated in text only for 1:8 ratio, 3 iterations: 17% without TOF (PSF had no significant effect) and 8% with TOF; other cells null. 'Mean hot/cold' rows of the table not copied.",
+     "provisional": false,
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "siemens-biograph-mct-flow",
+   "manufacturer": "Siemens Healthineers",
+   "name": "Siemens Biograph mCT Flow (4 rings, 22.1 cm)",
+   "match": {
+    "manufacturer": "siemens",
+    "model": "mCT\\s*Flow"
+   },
+   "afov_cm": 22.1,
+   "variant": "64-4R (TrueV)",
+   "tof_ps": 540,
+   "ring_diameter_cm": 84.2,
+   "dicom_model_names": [
+    "Biograph mCT Flow 20"
+   ],
+   "notes": "Geometry and values: Rausch 2015 (NU 2-2012, three 240 s single-bed acquisitions). Rausch report 2 iterations in Methods and 3 in Discussion for OSEM.",
+   "protocol": null,
+   "references": [
+    {
+     "id": "rausch2015-psftof-4to1",
+     "label": "PSF+TOF 2i21s, 3 mm, 4:1 (Rausch 2015)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Biograph mCT Flow 64-4R (4 rings, 22.1 cm AFOV)",
+     "ratio": 4.0,
+     "recon": "OSEM 3D + PSF + TOF; 2 it x 21 subsets; filter Gaussian 3 mm FWHM; matrix 200x200",
+     "acquisition": "240 s per bed; 1 bed(s); three sequential 240-s single-bed acquisitions, values = mean (max/min in paper); background ~5.3 kBq/mL; scatter-phantom line source 100/99 MBq; CT 120 kVp; spheres centred in FOV",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 28.5,
+      "13": 42.3,
+      "17": 58.4,
+      "22": 71.7,
+      "28": 70.1,
+      "37": 78.3
+     },
+     "bv_pct": {
+      "10": 4.7,
+      "13": 4.3,
+      "17": 3.7,
+      "22": 3.4,
+      "28": 3.2,
+      "37": 3.0
+     },
+     "lung_residual_pct": 12.7,
+     "citation": "Rausch I, Cal-González J, Dapra D, Gallowitsch HJ, Lind P, Beyer T, Minear G. Performance evaluation of the Biograph mCT Flow PET/CT system according to the NEMA NU2-2012 standard. EJNMMI Phys. 2015;2:26.",
+     "doi": "https://doi.org/10.1186/s40658-015-0132-1",
+     "table": "Table 3 (mean; max/min in paper), Methods 'Image quality'",
+     "notes": "Contrast column labelled 'Contrast recovery (%)'.",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "rausch2015-osem-4to1",
+     "label": "OSEM 2i24s, 3 mm, 4:1 (Rausch 2015)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Biograph mCT Flow 64-4R (4 rings, 22.1 cm AFOV)",
+     "ratio": 4.0,
+     "recon": "OSEM 3D (no PSF, no TOF); 2 it x 24 subsets; filter Gaussian 3 mm FWHM; matrix 200x200",
+     "acquisition": "240 s per bed; 1 bed(s); three sequential 240-s single-bed acquisitions, values = mean (max/min in paper); background ~5.3 kBq/mL; scatter-phantom line source 100/99 MBq; CT 120 kVp; spheres centred in FOV",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 21.5,
+      "13": 33.4,
+      "17": 47.8,
+      "22": 62.1,
+      "28": 61.2,
+      "37": 67.9
+     },
+     "bv_pct": {
+      "10": 5.6,
+      "13": 4.8,
+      "17": 3.9,
+      "22": 3.2,
+      "28": 2.7,
+      "37": 2.3
+     },
+     "lung_residual_pct": 22.8,
+     "citation": "Rausch I, Cal-González J, Dapra D, Gallowitsch HJ, Lind P, Beyer T, Minear G. Performance evaluation of the Biograph mCT Flow PET/CT system according to the NEMA NU2-2012 standard. EJNMMI Phys. 2015;2:26.",
+     "doi": "https://doi.org/10.1186/s40658-015-0132-1",
+     "table": "Table 3 (mean; max/min in paper), Methods 'Image quality'",
+     "notes": "OSEM iterations inconsistent within paper: Methods state 2 iterations/24 subsets, Discussion states 3D OSEM (3i, 24 s). Contrast column labelled 'Contrast recovery (%)'.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "rausch2015-psftof-8to1",
+     "label": "PSF+TOF 2i21s, 3 mm, 8:1 (Rausch 2015)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Biograph mCT Flow 64-4R (4 rings, 22.1 cm AFOV)",
+     "ratio": 8.0,
+     "recon": "OSEM 3D + PSF + TOF; 2 it x 21 subsets; filter Gaussian 3 mm FWHM; matrix 200x200",
+     "acquisition": "240 s per bed; 1 bed(s); three sequential 240-s single-bed acquisitions, values = mean (max/min in paper); background ~5.3 kBq/mL; scatter-phantom line source 100/99 MBq; CT 120 kVp; spheres centred in FOV",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 42.4,
+      "13": 63.6,
+      "17": 68.9,
+      "22": 76.7,
+      "28": 70.6,
+      "37": 78.5
+     },
+     "bv_pct": {
+      "10": 5.5,
+      "13": 4.8,
+      "17": 4.1,
+      "22": 3.4,
+      "28": 2.9,
+      "37": 2.5
+     },
+     "lung_residual_pct": 12.2,
+     "citation": "Rausch I, Cal-González J, Dapra D, Gallowitsch HJ, Lind P, Beyer T, Minear G. Performance evaluation of the Biograph mCT Flow PET/CT system according to the NEMA NU2-2012 standard. EJNMMI Phys. 2015;2:26.",
+     "doi": "https://doi.org/10.1186/s40658-015-0132-1",
+     "table": "Table 3 (mean; max/min in paper), Methods 'Image quality'",
+     "notes": "Contrast column labelled 'Contrast recovery (%)'.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "rausch2015-osem-8to1",
+     "label": "OSEM 2i24s, 3 mm, 8:1 (Rausch 2015)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Biograph mCT Flow 64-4R (4 rings, 22.1 cm AFOV)",
+     "ratio": 8.0,
+     "recon": "OSEM 3D (no PSF, no TOF); 2 it x 24 subsets; filter Gaussian 3 mm FWHM; matrix 200x200",
+     "acquisition": "240 s per bed; 1 bed(s); three sequential 240-s single-bed acquisitions, values = mean (max/min in paper); background ~5.3 kBq/mL; scatter-phantom line source 100/99 MBq; CT 120 kVp; spheres centred in FOV",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 35.3,
+      "13": 51.5,
+      "17": 59.6,
+      "22": 69.9,
+      "28": 61.8,
+      "37": 68.2
+     },
+     "bv_pct": {
+      "10": 5.7,
+      "13": 5.0,
+      "17": 4.1,
+      "22": 3.4,
+      "28": 2.8,
+      "37": 2.1
+     },
+     "lung_residual_pct": 22.3,
+     "citation": "Rausch I, Cal-González J, Dapra D, Gallowitsch HJ, Lind P, Beyer T, Minear G. Performance evaluation of the Biograph mCT Flow PET/CT system according to the NEMA NU2-2012 standard. EJNMMI Phys. 2015;2:26.",
+     "doi": "https://doi.org/10.1186/s40658-015-0132-1",
+     "table": "Table 3 (mean; max/min in paper), Methods 'Image quality'",
+     "notes": "OSEM iterations inconsistent within paper: Methods state 2 iterations/24 subsets, Discussion states 3D OSEM (3i, 24 s). Contrast column labelled 'Contrast recovery (%)'.",
+     "provisional": false,
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "siemens-biograph-horizon",
+   "manufacturer": "Siemens Healthineers",
+   "name": "Siemens Biograph Horizon (3 rings, 16.4 cm)",
+   "match": {
+    "manufacturer": "siemens",
+    "model": "Horizon"
+   },
+   "afov_cm": 16.4,
+   "variant": "3R (a 4R version exists; its axial FOV was not found)",
+   "tof_ps": null,
+   "dicom_model_names": [
+    "Biograph Horizon",
+    "Biograph16_Horizon 3R"
+   ],
+   "notes": "Identification only: no published per-sphere NEMA IQ values were found for the Biograph Horizon.",
+   "protocol": null,
+   "references": []
+  },
+  {
+   "id": "siemens-biograph-vision-450",
+   "manufacturer": "Siemens Healthineers",
+   "name": "Siemens Biograph Vision 450 (6 rings, 19.7 cm)",
+   "match": {
+    "manufacturer": "siemens",
+    "model": "Vision(\\D*450|\\s*3R)"
+   },
+   "match_verified": false,
+   "afov_cm": 19.7,
+   "variant": "6 rings",
+   "tof_ps": 213,
+   "dicom_model_names": [
+    "Biograph20_Vision 3R",
+    "Biograph40_Vision 3R",
+    "Biograph64_Vision 3R",
+    "Biograph128_Vision 3R",
+    "Biograph128_Vision 3R Edge"
+   ],
+   "notes": "Model-name strings from the Siemens Biograph Vision VG86A DICOM Conformance Statement (Print No. 10753734-EKL-861): 'Biograph<20|40|64|128>_Vision 3R' or '... 4R' (optional suffix ' Edge'). The mapping 3R = Vision 450 (19.7 cm) and 4R = Vision 600 (26.1-26.3 cm) is inferred from the 3:4 ratio of the axial FOVs (6 vs 8 block rings); verify on your system. Reference values: Carlier 2020 (NU 2-2012-type fill, 28/37 mm cold).",
+   "protocol": null,
+   "references": [
+    {
+     "id": "carlier2020-4i5s-220",
+     "label": "PSF+TOF 4i5s, no filter, 220x220 (Carlier 2020)",
+     "standard": "NEMA NU 2 (paper cites NU 2-2018 [ref 8]) but NU 2-2012-type fill: 10-22 mm hot at 4:1, 28/37 mm non-radioactive water",
+     "variant": "Biograph Vision 450 (6 rings, 19.7 cm AFOV)",
+     "ratio": 4.0,
+     "recon": "3D OP-OSEM + PSF + TOF; 4 it x 5 subsets; filter none; matrix 220x220; voxel 3.2 x 3.2 x 1.65 mm",
+     "acquisition": "240 s per bed; 1 bed(s); single acquisition; background 5.4 kBq/mL 18F-FDG; spheres centred axially; scatter phantom line source 153 MBq; analysed with manufacturer software",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 75.4,
+      "13": 78.4,
+      "17": 91.0,
+      "22": 96.3,
+      "28": 76.7,
+      "37": 83.2
+     },
+     "bv_pct": {
+      "10": 5.3,
+      "13": 4.4,
+      "17": 3.4,
+      "22": 2.7,
+      "28": 2.3,
+      "37": 1.9
+     },
+     "lung_residual_pct": 5.5,
+     "citation": "Carlier T, Ferrer L, Conti M, Bodet-Milin C, Rousseau C, Bercier Y, Bendriem B, Kraeber-Bodéré F. From a PMT-based to a SiPM-based PET system: a study to define matched acquisition/reconstruction parameters and NEMA performance of the Biograph Vision 450. EJNMMI Phys. 2020;7:55.",
+     "doi": "https://doi.org/10.1186/s40658-020-00323-w",
+     "table": "Table 3; Methods 'Image quality'",
+     "notes": "4i5s described by authors as close to routine clinical practice.",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "carlier2020-4i5s-440",
+     "label": "PSF+TOF 4i5s, no filter, 440x440 (Carlier 2020)",
+     "standard": "NEMA NU 2 (paper cites NU 2-2018 [ref 8]) but NU 2-2012-type fill: 10-22 mm hot at 4:1, 28/37 mm non-radioactive water",
+     "variant": "Biograph Vision 450 (6 rings, 19.7 cm AFOV)",
+     "ratio": 4.0,
+     "recon": "3D OP-OSEM + PSF + TOF; 4 it x 5 subsets; filter none; matrix 440x440; voxel 1.65 x 1.65 x 1.65 mm",
+     "acquisition": "240 s per bed; 1 bed(s); single acquisition; background 5.4 kBq/mL 18F-FDG; spheres centred axially; scatter phantom line source 153 MBq; analysed with manufacturer software",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 83.3,
+      "13": 82.4,
+      "17": 93.2,
+      "22": 98.7,
+      "28": 77.6,
+      "37": 84.1
+     },
+     "bv_pct": {
+      "10": 6.3,
+      "13": 5.0,
+      "17": 3.7,
+      "22": 2.7,
+      "28": 2.3,
+      "37": 1.9
+     },
+     "lung_residual_pct": 5.5,
+     "citation": "Carlier T, Ferrer L, Conti M, Bodet-Milin C, Rousseau C, Bercier Y, Bendriem B, Kraeber-Bodéré F. From a PMT-based to a SiPM-based PET system: a study to define matched acquisition/reconstruction parameters and NEMA performance of the Biograph Vision 450. EJNMMI Phys. 2020;7:55.",
+     "doi": "https://doi.org/10.1186/s40658-020-00323-w",
+     "table": "Table 3; Methods 'Image quality'",
+     "notes": "4i5s described by authors as close to routine clinical practice.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "carlier2020-8i5s-440",
+     "label": "PSF+TOF 8i5s, no filter, 440x440 (Carlier 2020)",
+     "standard": "NEMA NU 2 (paper cites NU 2-2018 [ref 8]) but NU 2-2012-type fill: 10-22 mm hot at 4:1, 28/37 mm non-radioactive water",
+     "variant": "Biograph Vision 450 (6 rings, 19.7 cm AFOV)",
+     "ratio": 4.0,
+     "recon": "3D OP-OSEM + PSF + TOF; 8 it x 5 subsets; filter none; matrix 440x440; voxel 1.65 x 1.65 x 1.65 mm",
+     "acquisition": "240 s per bed; 1 bed(s); single acquisition; background 5.4 kBq/mL 18F-FDG; spheres centred axially; scatter phantom line source 153 MBq; analysed with manufacturer software",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 94.4,
+      "13": 88.0,
+      "17": 96.5,
+      "22": 101.8,
+      "28": 84.6,
+      "37": 89.9
+     },
+     "bv_pct": {
+      "10": 9.5,
+      "13": 7.3,
+      "17": 5.2,
+      "22": 3.8,
+      "28": 3.1,
+      "37": 2.5
+     },
+     "lung_residual_pct": 3.2,
+     "citation": "Carlier T, Ferrer L, Conti M, Bodet-Milin C, Rousseau C, Bercier Y, Bendriem B, Kraeber-Bodéré F. From a PMT-based to a SiPM-based PET system: a study to define matched acquisition/reconstruction parameters and NEMA performance of the Biograph Vision 450. EJNMMI Phys. 2020;7:55.",
+     "doi": "https://doi.org/10.1186/s40658-020-00323-w",
+     "table": "Table 3 (values in brackets, 8 iterations); Methods 'Image quality'",
+     "notes": "8i5s set = parameters matching van Sluis 2019 (per Carlier).",
+     "provisional": false,
+     "default": false
+    }
+   ],
+   "dicom_model_names_source": "Siemens Biograph Vision VG86A DICOM Conformance Statement, Print No. 10753734-EKL-861"
+  },
+  {
+   "id": "siemens-biograph-vision-600",
+   "manufacturer": "Siemens Healthineers",
+   "name": "Siemens Biograph Vision 600 (8 rings, 26.1 cm)",
+   "match": {
+    "manufacturer": "siemens",
+    "model": "Vision(\\D*600|\\s*4R)"
+   },
+   "match_verified": false,
+   "afov_cm": 26.1,
+   "variant": "8 rings",
+   "tof_ps": 210,
+   "ring_diameter_cm": 82,
+   "dicom_model_names": [
+    "Biograph20_Vision 4R",
+    "Biograph40_Vision 4R",
+    "Biograph64_Vision 4R",
+    "Biograph128_Vision 4R",
+    "Biograph128_Vision 4R Edge"
+   ],
+   "notes": "Model-name strings from the Siemens Biograph Vision VG86A DICOM Conformance Statement (Print No. 10753734-EKL-861): 'Biograph<20|40|64|128>_Vision 3R' or '... 4R' (optional suffix ' Edge'). The mapping 3R = Vision 450 (19.7 cm) and 4R = Vision 600 (26.1-26.3 cm) is inferred from the 3:4 ratio of the axial FOVs (6 vs 8 block rings); verify on your system. The reference is a secondary transcription of van Sluis 2019 (primary tables not retrieved): provisional.",
+   "protocol": null,
+   "references": [
+    {
+     "id": "vansluis2019-8i5s-440",
+     "label": "PSF+TOF 8i5s, 440x440, 4:1 (van Sluis 2019, via Pena-Acosta 2025) - provisional",
+     "standard": "NEMA NU 2-2012 (van Sluis 2019; NU 2-2018 used only for TOF and co-registration)",
+     "variant": "Biograph Vision 600 (8 rings, 26.1 cm AFOV as reported by van Sluis)",
+     "ratio": 4.0,
+     "recon": "3D OP-OSEM + PSF + TOF; 8 it x 5 subsets; filter none (per Carlier 2020 description of the van Sluis parameters; not confirmed from the primary text); matrix 440x440; voxel 1.6 x 1.6 x 1.6 mm",
+     "acquisition": "1 bed(s); background 5.7 kBq/mL 18F-FDG at scan start; 8:1 and 4:1 sets; 28/37 mm spheres with non-radioactive water (JNM page text). Scan duration NOT retrieved from primary source; Peña-Acosta set 240 s in simulation 'to accurately reproduce the experiments' (secondary).",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 93.1,
+      "13": 73.5,
+      "17": 79.0,
+      "22": 87.0,
+      "28": 86.3,
+      "37": 89.4
+     },
+     "bv_pct": {
+      "10": 6.4,
+      "13": 5.0,
+      "17": 4.0,
+      "22": 3.1,
+      "28": 2.7,
+      "37": 2.2
+     },
+     "lung_residual_pct": 3.4,
+     "citation": "van Sluis J, de Jong J, Schaar J, Noordzij W, van Snick P, Dierckx R, Borra R, Willemsen A, Boellaard R. Performance characteristics of the digital Biograph Vision PET/CT system. J Nucl Med. 2019;60:1031-1036.; values as reproduced in Peña-Acosta MM, Gallardo S, Lorduy-Alós M, Verdú G. Application of NEMA protocols to verify GATE models based on the Digital Biograph Vision and the Biograph Vision Quadra scanners. Z Med Phys. 2025;35:318-330.",
+     "doi": "https://doi.org/10.2967/jnumed.118.215418; https://doi.org/10.1016/j.zemedi.2024.01.005",
+     "table": "Primary: van Sluis 2019 Table (4:1) — not retrieved; values copied from Peña-Acosta 2025 Table 5 'Experiment' column (ref [26] = van Sluis 2019); recon parameters from JNM article page text",
+     "notes": "PROVISIONAL: secondary transcription. Identical per-sphere values (contrast/BV) also appear in Br J Radiol 2023;96:20220387 Table 6 (doi 10.1259/bjr.20220387, secondary). 10-mm contrast (93.1%) inflated by PSF Gibbs overshoot per van Sluis/Peña-Acosta. The 8:1 table of van Sluis 2019 was not retrieved. van Sluis abstract range 'overall image contrast 77.2%-89.8%' does not match this 4:1 set and likely refers to another set (not verified).",
+     "provisional": true,
+     "default": true
+    }
+   ],
+   "dicom_model_names_source": "Siemens Biograph Vision VG86A DICOM Conformance Statement, Print No. 10753734-EKL-861"
+  },
+  {
+   "id": "ge-discovery-iq-5r",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery IQ (5 rings, 26 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*IQ"
+   },
+   "afov_cm": 26,
+   "variant": "5 rings (2- to 4-ring configurations exist: axial FOV 10.4-26 cm)",
+   "tof_ps": null,
+   "dicom_model_names": [
+    "Discovery IQ"
+   ],
+   "notes": "BGO, non-TOF. The model name does not encode the ring number; the GE axial-FOV header tag is used to select between profiles when several match. Gen 2: no peer-reviewed NEMA data found.",
+   "protocol": {
+    "source": "GE manufacturer NEMA IQ protocol as published by Vallot et al. EJNMMI Phys 2020;7:30, Table 1 (ring configuration not stated)",
+    "scan_time_s": [
+     352,
+     366,
+     381
+    ],
+    "replicates": 3,
+    "recon": {
+     "method": "VPHD",
+     "matrix": "256x256",
+     "fov_cm": 40,
+     "iterations": 8,
+     "subsets": 12,
+     "filter_mm": 2.0,
+     "zfilter": "none"
+    }
+   },
+   "published_limits": [
+    {
+     "id": "jha2019-ge-prescribed",
+     "name": "GE prescribed limits, Discovery IQ 5-ring, NU 2-2012 (as reproduced by Jha et al. 2019)",
+     "source": "Jha 2019 WJNM (doi 10.4103/wjnm.WJNM_72_18) Table 3 'Prescribed limits'",
+     "standard": "2012",
+     "contrast": [
+      30,
+      40,
+      50,
+      60,
+      60,
+      60
+     ],
+     "sphere_types": [
+      "hot",
+      "hot",
+      "hot",
+      "hot",
+      "cold",
+      "cold"
+     ],
+     "bv": [
+      12,
+      10,
+      9,
+      7,
+      6,
+      5
+     ],
+     "lung": 19,
+     "notes": "Reconstruction to which the limits apply is not stated. The same numeric pattern (30/40/50/60/60/60; 12/10/9/7/6/5; lung 19) is reported as the GE specification for the Omni Legend (NU 2-2018, all hot) in Smith et al. arXiv:2308.06255 Table 5 - a different scanner, noted only as a cross-check. Source uses strict inequalities; the program applies >= / <=."
+    }
+   ],
+   "references": [
+    {
+     "id": "jha2019-vphd",
+     "label": "VPHD, 4:1 (Jha 2019)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery IQ 5-ring (Tata Memorial, Mumbai)",
+     "ratio": 4.0,
+     "recon": "VPHD ('VUE Point HD Sharp IR'); iterations, subsets, filter and matrix for the IQ test not reported",
+     "acquisition": "single bed, 180 s ('NEMA IQ acquisition protocol'); 4 hot spheres 4:1, 28/37 mm water; scatter phantom 100 MBq; background 5.3 kBq/mL; CTAC 120 kVp 200 mA; GE analysis software",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 33.7,
+      "13": 43.1,
+      "17": 59.9,
+      "22": 67.7,
+      "28": 71.5,
+      "37": 74.2
+     },
+     "bv_pct": {
+      "10": 5.7,
+      "13": 4.7,
+      "17": 3.7,
+      "22": 2.8,
+      "28": 2.2,
+      "37": 1.8
+     },
+     "lung_residual_pct": 16.8,
+     "citation": "Jha AK, Mithun S, Puranik AD, Purandare NC, Shah S, Agrawal A, Rangarajan V. Performance characteristic evaluation of a bismuth germanate-based high-sensitivity 5-ring Discovery image quality PET/CT system as per NEMA NU 2-2012. World J Nucl Med. 2019;18(4):351-360",
+     "doi": "https://doi.org/10.4103/wjnm.WJNM_72_18",
+     "table": "Table 3 (VPHD rows); Methods 'Image quality'",
+     "notes": "Source access: full text via PMC6945355. Single 180 s acquisition (not 3 replicates). Table 3 also lists GE 'prescribed limits' (see public_acceptance_limits).",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "jha2019-qclear350",
+     "label": "Q.Clear beta 350, 4:1 (Jha 2019)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery IQ 5-ring (Tata Memorial, Mumbai)",
+     "ratio": 4.0,
+     "recon": "Q.Clear beta 350 ('prescribed by vendor'); matrix not reported",
+     "acquisition": "as VPHD entry",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 41.9,
+      "13": 59.4,
+      "17": 69.7,
+      "22": 85,
+      "28": 82.1,
+      "37": 88.9
+     },
+     "bv_pct": {
+      "10": 4.8,
+      "13": 4.1,
+      "17": 3.2,
+      "22": 2.4,
+      "28": 1.8,
+      "37": 1.3
+     },
+     "lung_residual_pct": 10.1,
+     "citation": "Jha AK, Mithun S, Puranik AD, Purandare NC, Shah S, Agrawal A, Rangarajan V. Performance characteristic evaluation of a bismuth germanate-based high-sensitivity 5-ring Discovery image quality PET/CT system as per NEMA NU 2-2012. World J Nucl Med. 2019;18(4):351-360",
+     "doi": "https://doi.org/10.4103/wjnm.WJNM_72_18",
+     "table": "Table 3 (Q.Clear rows); Discussion (beta 350)",
+     "notes": "Source access: full text via PMC6945355.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "vallot2020-vphd-8i12s",
+     "label": "VPHD 8i12s, 2 mm, 256x256 (Vallot 2020, 68Ge phantom)",
+     "standard": "NEMA NU 2-2012 (68Ge solid phantom variant)",
+     "variant": "Discovery IQ (5 European QUICK sites; ring configuration not stated)",
+     "ratio": 3.96,
+     "recon": "VPHD (OSEM, no PSF), 8 iterations, 12 subsets, 2 mm post-filter, no z-filter, 256 x 256, 40 cm DFOV (manufacturer NEMA recon, test 1)",
+     "acquisition": "GE manufacturer NEMA acquisition protocol; solid 68Ge IEC phantom (4 hot 25.2 kBq/mL, background 6.36 kBq/mL, 28/37 mm cold resin); NO out-of-field activity; 25 datasets per site (5/day x 5 days); console GE NEMA tool",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 29.4,
+      "13": 42.9,
+      "17": 52.9,
+      "22": 60.5,
+      "28": 67.9,
+      "37": 74.6
+     },
+     "bv_pct": {
+      "10": 7.4,
+      "13": 5.9,
+      "17": 4.6,
+      "22": 3.6,
+      "28": 2.8,
+      "37": 2.2
+     },
+     "lung_residual_pct": 16.4,
+     "citation": "Vallot D, De Ponti E, Morzenti S, Gramek A, Pieczonka A, Reynes-Llompart G, Siennicki J, Deak P, Dutta C, Uribe J, Caselles O. Evaluation of PET quantitation accuracy among multiple Discovery IQ PET/CT systems via NEMA image quality test. EJNMMI Phys. 2020;7:30",
+     "doi": "https://doi.org/10.1186/s40658-020-00294-y",
+     "table": "Table 4, column 'NEMA ACQ and RECON OSEM (test 1)'; Tables 1-3",
+     "notes": "Vendor recon parameters but non-standard phantom (solid 68Ge, no scatter phantom): comparable in recon, not strictly in acquisition.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "vallot2020-bsrem25",
+     "label": "Q.Clear beta 25, 256x256 (Vallot 2020, 68Ge phantom)",
+     "standard": "NEMA NU 2-2012 (68Ge solid phantom variant)",
+     "variant": "Discovery IQ (5 European QUICK sites)",
+     "ratio": 3.96,
+     "recon": "Q.Clear (BSREM + PSF) beta 25, 25 iterations, 256 x 256, 40 cm DFOV (test 2)",
+     "acquisition": "as test 1",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 39.9,
+      "13": 53.5,
+      "17": 61.4,
+      "22": 67.5,
+      "28": 77.7,
+      "37": 83.1
+     },
+     "bv_pct": {
+      "10": 8.9,
+      "13": 7.1,
+      "17": 5.4,
+      "22": 4.1,
+      "28": 3.1,
+      "37": 2.4
+     },
+     "lung_residual_pct": 12.2,
+     "citation": "Vallot D, De Ponti E, Morzenti S, Gramek A, Pieczonka A, Reynes-Llompart G, Siennicki J, Deak P, Dutta C, Uribe J, Caselles O. Evaluation of PET quantitation accuracy among multiple Discovery IQ PET/CT systems via NEMA image quality test. EJNMMI Phys. 2020;7:30",
+     "doi": "https://doi.org/10.1186/s40658-020-00294-y",
+     "table": "Table 4, column 'NEMA ACQ and RECON BSREM (test 2)'",
+     "notes": "beta 25 chosen to match OSEM noise level.",
+     "provisional": false,
+     "default": false
+    },
+    {
+     "id": "reynesllompart2017-secondary",
+     "label": "VPHD (Reynes-Llompart 2017, via Smith 2023) - provisional",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery IQ 5-ring (Bellvitge) - SECONDARY",
+     "ratio": 4.0,
+     "recon": "VPHD (iterations/subsets not given in secondary source)",
+     "acquisition": "as in Reynes-Llompart 2017 (not retrieved)",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 25,
+      "13": 40,
+      "17": 61,
+      "22": 68,
+      "28": 64,
+      "37": 68
+     },
+     "bv_pct": {
+      "10": 5.5,
+      "13": 4.9,
+      "17": 4.2,
+      "22": 3.6,
+      "28": 3.4,
+      "37": 3.3
+     },
+     "lung_residual_pct": 22.2,
+     "citation": "Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. NEMA NU 2-2018 performance evaluation of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT. arXiv:2308.06255",
+     "doi": "https://arxiv.org/abs/2308.06255",
+     "table": "Table 7, column 'Discovery IQ, Reynes-Llompart et al (9), NEMA NU2-2012'",
+     "notes": "Source access: preprint; published version Biomed Phys Eng Express 2024;10:025032, doi 10.1088/2057-1976/ad286c, not retrieved. SECONDARY transcription of Reynes-Llompart 2017 (primary Table 3 not retrieved). Smith et al. label all six as 'Hot Sphere', but under NU 2-2012 the 28/37 mm spheres are cold.",
+     "provisional": true,
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "ge-discovery-mi-3r",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery MI (3 rings, 15 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*MI(?!\\s*-?\\s*DR)"
+   },
+   "afov_cm": 15,
+   "variant": "Gen 1, 3 rings",
+   "tof_ps": 375.6,
+   "ring_diameter_cm": 74.4,
+   "dicom_model_names": [
+    "Discovery MI"
+   ],
+   "notes": "All Discovery MI configurations share the model name 'Discovery MI'; the GE axial-FOV header tag selects the ring configuration.",
+   "protocol": {
+    "source": "Vandendriessche et al. EJNMMI Phys 2019;6:8 (GE NEMA test procedure: 3 min 20 s per frame, VPFX 4 it / 34 subsets, 384x384; filter not stated)",
+    "scan_time_s": 200,
+    "replicates": 3,
+    "recon": {
+     "method": "VPFX",
+     "matrix": "384x384",
+     "iterations": 4,
+     "subsets": 34
+    }
+   },
+   "references": [
+    {
+     "id": "vandendriessche2019-vpfx",
+     "label": "VPFX 4i34s, 4:1 (Vandendriessche 2019)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery MI Gen1 3-ring (Bruges)",
+     "ratio": 4.0,
+     "recon": "VPFX (TOF-OSEM, no PSF), 384 x 384, 4 iterations, 34 subsets, CTAC; post-filter not stated",
+     "acquisition": "3 acquisitions, 3 min 20 s per frame (1 m in 30 min rule); background 5.27 kBq/cc; hot spheres 21 kBq/cc; 28/37 mm water; 120 MBq line source in scatter phantom; GE NEMA processing tools",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 47.4,
+      "13": 59.3,
+      "17": 67.0,
+      "22": 77.0,
+      "28": 82.5,
+      "37": 85.1
+     },
+     "bv_pct": {
+      "10": 16.4,
+      "13": 12.1,
+      "17": 9.1,
+      "22": 6.6,
+      "28": 5.1,
+      "37": 3.8
+     },
+     "lung_residual_pct": 8.5,
+     "citation": "Vandendriessche D, Uribe J, Bertin H, De Geeter F. Performance characteristics of silicon photomultiplier based 15-cm AFOV TOF PET/CT. EJNMMI Phys. 2019;6:8",
+     "doi": "https://doi.org/10.1186/s40658-019-0244-0",
+     "table": "Abstract (CR, BV, LE); Table 3 (CR); Methods p4-5; LE 8.5 +/- 0.3% p9",
+     "notes": "Mean of 3 acquisitions. Same data with Q.Clear beta 50: lung error 5.6 +/- 0.2% (p9); Q.Clear CR/BV only plotted (Fig. 5).",
+     "provisional": false,
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "ge-discovery-mi-4r",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery MI (4 rings, 20 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*MI(?!\\s*-?\\s*DR)"
+   },
+   "afov_cm": 20,
+   "variant": "Gen 1, 4 rings",
+   "tof_ps": 375.4,
+   "ring_diameter_cm": 74.4,
+   "dicom_model_names": [
+    "Discovery MI"
+   ],
+   "notes": "Reference contrast from the Hsu 2017 abstract only (BV, lung residual and recon details not retrievable).",
+   "protocol": {
+    "source": "Chicheportiche et al. EJNMMI Phys 2020;7:4, p4-5 (citing the GE Discovery MI NEMA test procedure)",
+    "scan_time_s": [
+     271,
+     279,
+     282
+    ],
+    "replicates": 3,
+    "recon": {
+     "method": "VPFX",
+     "matrix": "384x384",
+     "iterations": 4,
+     "subsets": 34,
+     "filter_mm": 2.0
+    }
+   },
+   "references": [
+    {
+     "id": "hsu2017-abstract",
+     "label": "Averaged CRC (Hsu 2017 abstract) - contrast only",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery MI Gen1 4-ring (Stanford + Uppsala average)",
+     "ratio": 4.0,
+     "recon": "not retrieved",
+     "acquisition": "not retrieved (full text inaccessible). Vandendriessche 2019 (p9) states NU 2-2012 frame time for a 4-ring DMI is 4 min 31 s, and (p12) that the Stanford background fill was 0.6 kBq/ml as quoted from Hsu",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 53.7,
+      "13": 64.0,
+      "17": 73.1,
+      "22": 82.7,
+      "28": 86.8,
+      "37": 90.7
+     },
+     "bv_pct": null,
+     "lung_residual_pct": null,
+     "citation": "Hsu DFC, Ilan E, Peterson WT, Uribe J, Lubberink M, Levin CS. Studies of a next-generation silicon-photomultiplier-based time-of-flight PET/CT system. J Nucl Med. 2017;58(9):1511-1518",
+     "doi": "https://doi.org/10.2967/jnumed.117.189514",
+     "table": "Abstract (averaged contrast recovery coefficients); same values tabulated in Vandendriessche 2019 Table 3 (DMI 4 column)",
+     "notes": "Source access: ABSTRACT ONLY via PubMed PMID 28450566; full text blocked by publisher bot protection. Primary BV, lung residual and reconstruction details could not be retrieved (journal site behind a bot challenge). Vandendriessche 2019 (p5) states Hsu used Q.Clear beta 50 for comparison. Ratio assumed nominal 4:1 (NU 2-2012); not stated in the retrieved abstract.",
+     "provisional": false,
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "ge-discovery-mi-5r",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery MI (5 rings, 25 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*MI(?!\\s*-?\\s*DR)"
+   },
+   "afov_cm": 25,
+   "variant": "Gen 1 and Gen 2, 5 rings",
+   "tof_ps": 381.7,
+   "dicom_model_names": [
+    "Discovery MI"
+   ],
+   "notes": "Gen 1 (Pan 2019, NU 2-2012) and Gen 2 (Zeimpekis 2022, NU 2-2018) share the 25 cm axial FOV; choose the reference that matches the system generation.",
+   "protocol": {
+    "source": "Zeimpekis et al. EJNMMI 2022;49:3023, p3 (Gen 2, NU 2-2018 scan times; VPFX 4 it / 34 subsets, 2 mm, 384x384)",
+    "scan_time_s": [
+     323,
+     334,
+     346
+    ],
+    "replicates": 3,
+    "recon": {
+     "method": "VPFX",
+     "matrix": "384x384",
+     "iterations": 4,
+     "subsets": 34,
+     "filter_mm": 2.0
+    }
+   },
+   "references": [
+    {
+     "id": "pan2019-5r",
+     "label": "VPFX, 4:1, Gen 1, mean of 3 sites (Pan 2019)",
+     "standard": "NEMA NU 2-2012",
+     "variant": "Discovery MI Gen1 5-ring (3 institutions: MD Anderson, MGH, UW)",
+     "ratio": 4.0,
+     "recon": "iterative reconstruction with TOF (VPFX); iterations/subsets/filter for the IQ test not stated (4 it / 34 subsets / 2 mm 'per vendor recommendations' stated for the spatial-resolution IR); matrix not stated for IQ",
+     "acquisition": "background ~5 kBq/cc at start; hot spheres 4:1; 28/37 mm cold; scatter phantom line source ~100 MBq; 5-10 min per acquisition, repeated twice with slightly longer duration (3 acquisitions); vendor NEMA tools",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": 46.2,
+      "13": 54.3,
+      "17": 66.1,
+      "22": 71.1,
+      "28": 85.3,
+      "37": 89.3
+     },
+     "bv_pct": {
+      "10": 9.26,
+      "13": 7.07,
+      "17": 5.38,
+      "22": 4.37,
+      "28": 3.8,
+      "37": 3.45
+     },
+     "lung_residual_pct": 5.85,
+     "citation": "Pan T, Einstein SA, Kappadath SC, Grogg KS, Lois Gomez C, Alessio AM, Hunter WC, El Fakhri G, Kinahan PE, Mawlawi OR. Performance evaluation of the 5-Ring GE Discovery MI PET/CT system using the NEMA NU 2-2012 Standard. Med Phys. 2019;46(7):3025-3033",
+     "doi": "https://doi.org/10.1002/mp.13576",
+     "table": "Table 1 ('Image Quality, IR'); Methods 2.B.5",
+     "notes": "Source access: full text read via PMC7251507. Mean +/- SD over three scanners. Authors note IQ results were more variable between centres than other tests.",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "zeimpekis2022-5r-vpfx",
+     "label": "VPFX 4i34s 2 mm, all hot, Gen 2 (Zeimpekis 2022)",
+     "standard": "NEMA NU 2-2018",
+     "variant": "Discovery MI Gen2 5-ring (Zurich)",
+     "ratio": 4.0,
+     "recon": "VPFX (TOF-OSEM) 4 iterations / 34 subsets, 2 mm Gaussian, 384 x 384",
+     "acquisition": "background 5.3 kBq/mL at scan time, all 6 spheres hot 4:1; ~120 MBq in scatter phantom; 3 scans 5:23, 5:34, 5:46 min (emulating 100 cm in 30 min); vendor software tools",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "hot",
+      "37": "hot"
+     },
+     "contrast_pct": {
+      "10": 48.0,
+      "13": 57.8,
+      "17": 70.4,
+      "22": 78.2,
+      "28": 83.3,
+      "37": 86.9
+     },
+     "bv_pct": {
+      "10": 8.5,
+      "13": 6.8,
+      "17": 5.2,
+      "22": 3.8,
+      "28": 2.8,
+      "37": 2.3
+     },
+     "lung_residual_pct": 4.0,
+     "citation": "Zeimpekis KG, Kotasidis FA, Huellner M, Nemirovsky A, Kaufmann PA, Treyer V. NEMA NU 2-2018 performance evaluation of a new generation 30-cm axial field-of-view Discovery MI PET/CT. Eur J Nucl Med Mol Imaging. 2022;49:3023-3032",
+     "doi": "https://doi.org/10.1007/s00259-022-05751-7",
+     "table": "Table 1, column 'DMI Gen2 5R', 'Image quality (VPFX)'; Methods p3",
+     "notes": "",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "zeimpekis2022-5r-qclear50",
+     "label": "Q.Clear beta 50, all hot, Gen 2 (Zeimpekis 2022)",
+     "standard": "NEMA NU 2-2018",
+     "variant": "Discovery MI Gen2 5-ring (Zurich)",
+     "ratio": 4.0,
+     "recon": "Q.Clear (BSREM with resolution modelling, TOF) beta 50, no filtering, 384 x 384",
+     "acquisition": "as VPFX entry above",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "hot",
+      "37": "hot"
+     },
+     "contrast_pct": {
+      "10": 64.5,
+      "13": 70.7,
+      "17": 78.3,
+      "22": 84.2,
+      "28": 88.6,
+      "37": 90.2
+     },
+     "bv_pct": {
+      "10": 6.5,
+      "13": 5.2,
+      "17": 3.7,
+      "22": 2.8,
+      "28": 2.2,
+      "37": 1.8
+     },
+     "lung_residual_pct": 3.2,
+     "citation": "Zeimpekis KG, Kotasidis FA, Huellner M, Nemirovsky A, Kaufmann PA, Treyer V. NEMA NU 2-2018 performance evaluation of a new generation 30-cm axial field-of-view Discovery MI PET/CT. Eur J Nucl Med Mol Imaging. 2022;49:3023-3032",
+     "doi": "https://doi.org/10.1007/s00259-022-05751-7",
+     "table": "Table 1, column 'DMI Gen2 5R', 'Image quality (QClear)'",
+     "notes": "",
+     "provisional": false,
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "ge-discovery-mi-6r",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery MI (6 rings, 30 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*MI(?!\\s*-?\\s*DR)"
+   },
+   "afov_cm": 30,
+   "variant": "Gen 2, 6 rings",
+   "tof_ps": 389.6,
+   "dicom_model_names": [
+    "Discovery MI"
+   ],
+   "notes": "",
+   "protocol": {
+    "source": "Zeimpekis et al. EJNMMI 2022;49:3023, p3 (NU 2-2018 scan times 6:23, 6:39, 6:54; VPFX 4 it / 34 subsets, 2 mm, 384x384)",
+    "scan_time_s": [
+     383,
+     399,
+     414
+    ],
+    "replicates": 3,
+    "recon": {
+     "method": "VPFX",
+     "matrix": "384x384",
+     "iterations": 4,
+     "subsets": 34,
+     "filter_mm": 2.0
+    }
+   },
+   "references": [
+    {
+     "id": "zeimpekis2022-6r-vpfx",
+     "label": "VPFX 4i34s 2 mm, all hot (Zeimpekis 2022)",
+     "standard": "NEMA NU 2-2018",
+     "variant": "Discovery MI Gen2 6-ring (Zurich)",
+     "ratio": 4.0,
+     "recon": "VPFX 4 iterations / 34 subsets, 2 mm Gaussian, 384 x 384",
+     "acquisition": "background 5.3 kBq/mL, all spheres hot 4:1; ~120 MBq scatter phantom; 3 scans 6:23, 6:39, 6:54 min",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "hot",
+      "37": "hot"
+     },
+     "contrast_pct": {
+      "10": 54.5,
+      "13": 63.2,
+      "17": 68.0,
+      "22": 76.9,
+      "28": 82.4,
+      "37": 85.8
+     },
+     "bv_pct": {
+      "10": 6.8,
+      "13": 5.0,
+      "17": 4.0,
+      "22": 3.2,
+      "28": 2.5,
+      "37": 1.9
+     },
+     "lung_residual_pct": 3.16,
+     "citation": "Zeimpekis KG, Kotasidis FA, Huellner M, Nemirovsky A, Kaufmann PA, Treyer V. NEMA NU 2-2018 performance evaluation of a new generation 30-cm axial field-of-view Discovery MI PET/CT. Eur J Nucl Med Mol Imaging. 2022;49:3023-3032",
+     "doi": "https://doi.org/10.1007/s00259-022-05751-7",
+     "table": "Table 1, column 'DMI Gen2 6R', 'Image quality (VPFX)'",
+     "notes": "",
+     "provisional": false,
+     "default": true
+    },
+    {
+     "id": "zeimpekis2022-6r-qclear50",
+     "label": "Q.Clear beta 50, all hot (Zeimpekis 2022)",
+     "standard": "NEMA NU 2-2018",
+     "variant": "Discovery MI Gen2 6-ring (Zurich)",
+     "ratio": 4.0,
+     "recon": "Q.Clear beta 50, no filtering, 384 x 384",
+     "acquisition": "as VPFX 6-ring entry",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "hot",
+      "37": "hot"
+     },
+     "contrast_pct": {
+      "10": 66.4,
+      "13": 72.5,
+      "17": 77.7,
+      "22": 84.8,
+      "28": 87.4,
+      "37": 89.6
+     },
+     "bv_pct": {
+      "10": 4.6,
+      "13": 3.5,
+      "17": 2.5,
+      "22": 1.9,
+      "28": 1.5,
+      "37": 1.3
+     },
+     "lung_residual_pct": 2.6,
+     "citation": "Zeimpekis KG, Kotasidis FA, Huellner M, Nemirovsky A, Kaufmann PA, Treyer V. NEMA NU 2-2018 performance evaluation of a new generation 30-cm axial field-of-view Discovery MI PET/CT. Eur J Nucl Med Mol Imaging. 2022;49:3023-3032",
+     "doi": "https://doi.org/10.1007/s00259-022-05751-7",
+     "table": "Table 1, column 'DMI Gen2 6R', 'Image quality (QClear)'",
+     "notes": "",
+     "provisional": false,
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "ge-discovery-mi-dr",
+   "manufacturer": "GE HealthCare",
+   "name": "GE Discovery MI DR (15.6 cm)",
+   "match": {
+    "manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+    "model": "Discovery\\s*MI\\s*-?\\s*DR"
+   },
+   "afov_cm": 15.6,
+   "variant": "PMT-based 'Digital Ready'",
+   "tof_ps": 552.71,
+   "dicom_model_names": [
+    "Discovery MI DR"
+   ],
+   "notes": "Identification and protocol only: published per-sphere values are shown in figures only (Chicheportiche 2020) or paywalled (Michopoulou 2019).",
+   "protocol": {
+    "source": "Chicheportiche et al. EJNMMI Phys 2020;7:4, p4-5 (citing the GE Discovery MI DR NEMA test procedure)",
+    "scan_time_s": [
+     212,
+     217,
+     222
+    ],
+    "replicates": 3,
+    "recon": {
+     "method": "VPFX",
+     "matrix": "384x384",
+     "iterations": 4,
+     "subsets": 24,
+     "filter_mm": 2.0
+    }
+   },
+   "references": []
+  }
+ ]
+}

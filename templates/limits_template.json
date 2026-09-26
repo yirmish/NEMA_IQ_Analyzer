@@ -1,0 +1,25 @@
+{
+ "format": "nema-iq-limits",
+ "version": 1,
+ "name": "Acceptance limits - <manufacturer> <system> (<axial FOV>)",
+ "source": "<document title, number, revision and table the values were taken from>",
+ "standard": "2018",
+ "_comment": "Six values for the 10, 13, 17, 22, 28, 37 mm spheres; null where no limit applies. Contrast limits (>=) refer to the sphere types of 'standard' (\"2012\": 10-22 mm hot, 28/37 mm cold; \"2018\": all hot) unless 'sphere_types' is given, e.g. [\"hot\",\"hot\",\"hot\",\"hot\",\"cold\",\"cold\"]. BV limits are <=, lung limit is <= (null = no limit). Load via Acceptance limits > Load limits JSON.",
+ "contrast": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "bv": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "lung": null
+}

@@ -1,0 +1,74 @@
+{
+ "meta": {
+  "title": "Additional scanner profiles",
+  "version": "1"
+ },
+ "profiles": [
+  {
+   "id": "vendor-model-variant",
+   "manufacturer": "<Vendor>",
+   "name": "<Vendor> <Model> (<axial FOV> cm)",
+   "match": {
+    "manufacturer": "<regex on DICOM Manufacturer (0008,0070)>",
+    "model": "<regex on ManufacturerModelName (0008,1090)>"
+   },
+   "afov_cm": null,
+   "variant": "<rings / configuration>",
+   "tof_ps": null,
+   "_comment": "Load via Scanner profile > Load profile JSON. 'protocol' is optional: expected values are checked in the QA-details page. 'references' are published values shown for comparison only (never PASS/FAIL); give the source for every set.",
+   "protocol": {
+    "source": "<public document>",
+    "scan_time_s": null,
+    "replicates": null,
+    "recon": {
+     "method": null,
+     "matrix": null,
+     "pixel_mm": null,
+     "fov_cm": null,
+     "iterations": null,
+     "subsets": null,
+     "filter_mm": null,
+     "zfilter": null
+    }
+   },
+   "references": [
+    {
+     "id": "ref1",
+     "label": "<recon short name>",
+     "standard": "NU 2-2012",
+     "variant": "",
+     "recon": "<algorithm, iterations x subsets, filter, matrix>",
+     "acquisition": "<scan time, ratio>",
+     "sphere_types": {
+      "10": "hot",
+      "13": "hot",
+      "17": "hot",
+      "22": "hot",
+      "28": "cold",
+      "37": "cold"
+     },
+     "contrast_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "bv_pct": {
+      "10": null,
+      "13": null,
+      "17": null,
+      "22": null,
+      "28": null,
+      "37": null
+     },
+     "lung_residual_pct": null,
+     "citation": "<authors, title, journal year;vol:pages>",
+     "doi": "<doi or url>",
+     "default": true
+    }
+   ]
+  }
+ ]
+}

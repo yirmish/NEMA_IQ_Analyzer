@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "NEMA IQ Analyzer"
+version: "2.0.0"
+date-released: "2026-09-26"
+license: MIT
+authors:
+  - name: "The NEMA IQ Analyzer authors"
+abstract: >-
+  Offline, single-file HTML program for the analysis of the NEMA NU 2 (2012/2018) PET image-quality test
+  (IEC/NEMA body phantom): sphere contrast, background variability and lung residual from PET DICOM images,
+  with protocol checks, optional scanner profiles with published reference values, and a printable report.
+keywords:
+  - PET
+  - NEMA NU 2
+  - image quality
+  - quality assurance
+  - DICOM
+  - medical physics
