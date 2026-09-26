@@ -1,0 +1,4 @@
+# Keep LF line endings on every platform so that SHA256SUMS.txt and the rebuild check stay valid after checkout.
+* text=auto eol=lf
+*.pdf binary
+*.png binary

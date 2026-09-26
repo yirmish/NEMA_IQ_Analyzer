@@ -1,0 +1,23 @@
+# Never commit image data or analysis outputs: DICOM files can contain patient and site identifiers.
+*.dcm
+*.DCM
+*.ima
+*.IMA
+DICOMDIR
+**/DICOM/
+**/Studies/
+data/
+results/
+NEMA_IQ_results_*
+NEMA_IQ_lung_*
+NEMA_IQ_report_*
+NEMA_IQ_baseline_*
+
+# Local build and tool files
+node_modules/
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
