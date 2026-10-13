@@ -1,13 +1,19 @@
 # Changelog
 
-## Unreleased
+## 2.0.1 — unreleased
+
+### Analysis
+- Background ROIs: the distance from the phantom wall is measured to the wall located with sub-pixel precision (50 % of
+  the background in the smoothed image, 5x finer grid). Version 2.0.0 measured it to the centres of the first pixels
+  outside the phantom mask, which placed the ROIs up to one pixel (on average 0.1-0.3 pixel) closer to the wall than the
+  reported margin. On digital phantoms the true wall gap of the closest ROI is now 15.2 mm without noise and
+  14.7-15.2 mm with noise (2.0.0: 14.5 mm and 13.7-14.4 mm). The ROIs move inwards by up to about one pixel, so C_B and
+  BV differ slightly from 2.0.0 (digital phantoms: C_B,37 by up to 0.1 %, BV by up to about 0.3 percentage points).
 
 ### Tests
 - Digital IEC body phantoms with known ground truth (`tests/`): measurement, truth and rule checks on 9 cases (NU 2-2012
   and 2018 fills, 8:1, no lung insert, tilt, 1.65-4 mm voxels, noise, replicates, START/ADMIN, CNTS, Implicit VR).
 - GitHub Actions: digital-phantom tests, rebuild check of the HTML, `profiles.js` and `SOURCES.md`, checksum check.
-- Found by the tests: background ROIs lie 0.25-0.4 pixel closer to the phantom wall than the reported margin (wall
-  distance measured to the centres of the first pixels outside the phantom). Not changed in this release.
 
 ## 2.0.0 — 2026-09-26 (first public release)
 

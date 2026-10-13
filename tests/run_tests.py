@@ -30,11 +30,12 @@ SPHERE_D = [10, 13, 17, 22, 28, 37]
 
 # Tolerances. q_meas: |contrast difference| of the measurement check [percentage points]; bv_meas, lung_meas likewise.
 # loc_xy / loc_z: sphere-centre error [mm]; q_e2e: |contrast(program) - contrast(ROI at the true centre)| per sphere;
-# cb: relative error of C_B,37 against the true background; ring: |ring radius - 57.2| [mm].
+# cb: relative error of C_B,37 against the true background; ring: |ring radius - 57.2| [mm]; wall: how far [mm] a
+# background ROI may come closer to the true phantom wall than the reported margin.
 EXACT = dict(q_meas=0.01, bv_meas=0.005, lung_meas=0.005, loc_xy=0.25, loc_z=0.25, q_e2e=dict.fromkeys(SPHERE_D, 0.5),
-             cb=0.001, ring=0.3, mexp=0.002, bv_max=0.05, lung_truth=0.1, tilt=0.3)
+             cb=0.001, ring=0.3, mexp=0.002, bv_max=0.05, lung_truth=0.1, tilt=0.3, wall=0.2)
 NOISY = dict(EXACT, loc_xy=1.0, loc_z=1.0, q_e2e={10: 2.0, 13: 2.0, 17: 1.0, 22: 1.0, 28: 0.5, 37: 0.5},
-             cb=0.01, ring=1.0, mexp=0.01, bv_max=None, lung_truth=None, tilt=0.5)
+             cb=0.01, ring=1.0, mexp=0.01, bv_max=None, lung_truth=None, tilt=0.5, wall=0.5)
 COARSE = dict(NOISY, loc_xy=1.5, loc_z=1.5, q_e2e={10: 3.0, 13: 3.0, 17: 1.5, 22: 1.5, 28: 1.0, 37: 1.0})
 
 CASES = [
@@ -231,11 +232,8 @@ def run_case(case, workdir):
     m = S['bg_margin_mm']
     check(m == 15.0, f'background ROI margin reduced to {m} mm (12 ROIs fit at 15 mm in this phantom)')
     check(len(R['rois']['bgCentres']) == 12, f"{len(R['rois']['bgCentres'])} background ROI centres")
-    # Known deviation (version 2.0.0): the program measures the wall distance to the centres of the first pixels outside
-    # the phantom mask, i.e. up to half a pixel beyond the wall, so the background ROIs come 0.25-0.4 pixel closer to the
-    # wall than the reported margin. Allowed here as 0.5 pixel; the margin to spheres and lung insert has no such offset.
     for what, g in gaps.items():
-        allow = 0.5 * px + 0.3 if what == 'wall' else 0.6
+        allow = T['wall'] if what == 'wall' else 0.6
         check(g >= m - allow, f'background ROI {what} gap {g:.2f} mm < margin {m} mm - {allow:.2f} mm')
     if truth['lung_present']:
         excl = 10.0 if std == '2012' else 30.0

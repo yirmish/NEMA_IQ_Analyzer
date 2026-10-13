@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  NEMA IQ Analyzer v2.0.0 - offline analysis of the NEMA NU 2 PET image-quality test.
+  NEMA IQ Analyzer v2.0.1 - offline analysis of the NEMA NU 2 PET image-quality test.
   Copyright (c) 2026 The NEMA IQ Analyzer authors. Released under the MIT License (see LICENSE in the source repository).
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. Not a medical device.
 -->
@@ -160,7 +160,7 @@
     <div id="report"></div>
   </section>
 </main>
-<footer class="app">NEMA IQ Analyzer v2.0.0 · analysis per NEMA NU 2 Sec. 7 (image quality, accuracy of attenuation and scatter corrections) · for QA use by qualified medical physicists ·
+<footer class="app">NEMA IQ Analyzer v2.0.1 · analysis per NEMA NU 2 Sec. 7 (image quality, accuracy of attenuation and scatter corrections) · for QA use by qualified medical physicists ·
   <b>Not a medical device.</b> Provided without warranty; verify results and follow the manufacturer's test procedure and acceptance criteria.
   · © 2026 The NEMA IQ Analyzer authors · MIT License</footer>
 <script>// generated from scanner_profiles.json by build.py - edit the JSON, not this file
@@ -1647,7 +1647,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.0';
+N.VERSION = '2.0.1';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
@@ -2625,7 +2625,7 @@ N.localize = function (img, dims, px, dz, opts, log) {
   log.info('sphere axial centres (slice): ' + spheres.map(q => `${q.d}:${q.z.toFixed(2)}`).join(', '));
   log.info(`common central slice ${iz0} (median sphere z ${z0.toFixed(2)}, offset ${((z0 - iz0) * dz).toFixed(2)} mm)`);
 
-  return { bg_smooth: bg, body2d: body.slice(iz0 * npx, (iz0 + 1) * npx), zb: [zb0, zb1], lung_present: lungOK, lung_z: lungOK ? [zl0, zl1] : null, lung_fit: [fx, fy], lungXY,
+  return { bg_smooth: bg, body2d: body.slice(iz0 * npx, (iz0 + 1) * npx), smooth2d: s.slice(iz0 * npx, (iz0 + 1) * npx), edge_level: 0.5 * bg, zb: [zb0, zb1], lung_present: lungOK, lung_z: lungOK ? [zl0, zl1] : null, lung_fit: [fx, fy], lungXY,
            lung_tilt_deg: tilt, lung_d_eq: lungDeq, spheres, ring, z0, iz0, sphere_z_spread_mm: zspread, id_rank_corr: best.rho };
 };
 
@@ -2665,11 +2665,38 @@ function maxMinSpacing(cand, px, nroi, slo, shi = 90) {
   for (let i = 0; i < 14; i++) { const mid = 0.5 * (lo + hi), ch = greedy(mid); if (ch) { lo = mid; best = ch; } else hi = mid; }
   return [lo, best];
 }
+/* Distance [mm] of each pixel centre from the phantom wall. The wall is where the smoothed image crosses the body-mask
+   threshold (50 % of the background), located by bilinear interpolation on a grid U times finer than the pixels; the
+   distance is measured to the edge of the nearest fine pixel outside the phantom. (Measured to the centres of the
+   pixels outside the body mask, it would be up to one pixel too long and the ROIs too close to the wall.) */
+function wallDistance(geom, ny, nx, px) {
+  const U = 5, c = (U - 1) / 2, b = geom.body2d, s = geom.smooth2d, lev = geom.edge_level;
+  let y0 = ny, y1 = -1, x0 = nx, x1 = -1;
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) if (b[y * nx + x]) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
+  y0 = Math.max(y0 - 2, 0); x0 = Math.max(x0 - 2, 0); y1 = Math.min(y1 + 2, ny - 1); x1 = Math.min(x1 + 2, nx - 1);
+  const h = (y1 - y0 + 1) * U, w = (x1 - x0 + 1) * U, m = new Uint8Array(h * w);
+  for (let fy = 0; fy < h; fy++) {
+    const yc = y0 + (fy - c) / U, ya = Math.min(Math.max(Math.floor(yc), 0), ny - 1), yb = Math.min(ya + 1, ny - 1);
+    for (let fx = 0; fx < w; fx++) {
+      const xc = x0 + (fx - c) / U, xa = Math.min(Math.max(Math.floor(xc), 0), nx - 1), xb = Math.min(xa + 1, nx - 1);
+      const n = b[ya * nx + xa] + b[ya * nx + xb] + b[yb * nx + xa] + b[yb * nx + xb];   // inside / outside / at the edge of the mask
+      m[fy * w + fx] = n === 4 ? 1 : n === 0 ? 0 : bilinear(s, ny, nx, yc, xc) >= lev ? 1 : 0;
+    }
+  }
+  const d = edt2d(m, h, w), out = new Float32Array(ny * nx);
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const v = d[((y - y0) * U + c) * w + (x - x0) * U + c];
+    out[y * nx + x] = v > 0 ? (v - 0.5) / U * px : 0;
+  }
+  return out;
+}
+N.wallDistance = wallDistance;
+
 /* NEMA: 12 x 37 mm background ROIs 15 mm from the phantom edge and >= 15 mm from any sphere.
    Both margins cannot always be met by 12 NON-overlapping ROIs; the common margin (wall / sphere /
    lung insert) is reduced in 0.5 mm steps until 12 ROIs fit, and they are spread to maximise spacing. */
 N.placeBackgroundROIs = function (geom, ny, nx, px, log) {
-  const dist = edt2d(geom.body2d, ny, nx); for (let i = 0; i < dist.length; i++) dist[i] *= px;
+  const dist = wallDistance(geom, ny, nx, px);
   const [cx, cy] = geom.lungXY(geom.iz0), rroi = BG_ROI_D / 2, minSep = BG_ROI_D + 1.0;
   let m = EDGE_MARGIN, sel = null, spacing = 0, cand = [];
   while (m >= 5.0 - 1e-9) {
