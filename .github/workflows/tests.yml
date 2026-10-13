@@ -1,0 +1,43 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  consistency:
+    name: Build and checksums
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuilt NEMA_IQ_Analyzer.html, profiles.js and SOURCES.md match the committed files
+        run: |
+          python src/build.py "$RUNNER_TEMP/NEMA_IQ_Analyzer.html"
+          cmp "$RUNNER_TEMP/NEMA_IQ_Analyzer.html" NEMA_IQ_Analyzer.html
+          python src/make_sources.py
+          git diff --exit-code -- src/profiles.js SOURCES.md
+      - name: SHA256SUMS.txt is valid and lists every tracked file
+        run: |
+          sha256sum --strict -c SHA256SUMS.txt
+          diff <(git ls-files | grep -vx SHA256SUMS.txt | LC_ALL=C sort) <(sed 's/^[0-9a-f]*  //' SHA256SUMS.txt)
+
+  digital-phantom:
+    name: Digital-phantom verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install -r tests/requirements.txt
+      - run: python tests/run_tests.py --jobs 4 --summary "$GITHUB_STEP_SUMMARY"

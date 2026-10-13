@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Tests
+- Digital IEC body phantoms with known ground truth (`tests/`): measurement, truth and rule checks on 9 cases (NU 2-2012
+  and 2018 fills, 8:1, no lung insert, tilt, 1.65-4 mm voxels, noise, replicates, START/ADMIN, CNTS, Implicit VR).
+- GitHub Actions: digital-phantom tests, rebuild check of the HTML, `profiles.js` and `SOURCES.md`, checksum check.
+- Found by the tests: background ROIs lie 0.25-0.4 pixel closer to the phantom wall than the reported margin (wall
+  distance measured to the centres of the first pixels outside the phantom). Not changed in this release.
+
 ## 2.0.0 — 2026-09-26 (first public release)
 
 First vendor-neutral release, derived from an in-house tool (1.x) used for the annual PET QA of GE systems.
