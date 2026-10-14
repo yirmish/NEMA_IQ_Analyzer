@@ -163,7 +163,7 @@ function readOpts() {
           : $('limSel').value.startsWith('profile:') ? (() => { const p = currentProfile(), id = $('limSel').value.slice(8);
               const l = p && (p.published_limits || []).find(x => x.id === id); if (!l) throw new Error('published limits not available for this profile');
               return N.normLimits(Object.assign({}, l, { name: l.name, source: l.source })); })() : null,
-    sliceMode: $('sliceSel').value, sphereTypes: $('typeSel').value,
+    sliceMode: $('sliceSel').value, sphereTypes: $('typeSel').value, lungRange: $('lungSel').value, lungExclMm: num('lungExcl'),
     baseline: $('baseSel').value === 'file' ? baselineObj : null,
     site: $('site').value.trim(), operator: $('operator').value.trim(),
     seriesKeys: Array.from(document.querySelectorAll('.selser:checked')).map(c => c.value)
@@ -228,6 +228,9 @@ $('htmlBtn').addEventListener('click', () => {
     await setFiles(fl, 'autotest');
     if (q.get('std')) document.querySelector(`input[name=std][value="${q.get('std')}"]`).checked = true;
     if (q.get('site')) $('site').value = q.get('site');
+    if (q.get('slice')) $('sliceSel').value = q.get('slice');
+    if (q.get('lung')) $('lungSel').value = q.get('lung');
+    if (q.get('lungExcl') != null) $('lungExcl').value = q.get('lungExcl');
     if (q.get('recon') && $('reconSel')) { $('reconSel').value = q.get('recon'); $('reconSel').dispatchEvent(new Event('change')); }
     if (q.get('prof')) { $('profSel').value = q.get('prof'); $('profSel').dispatchEvent(new Event('change')); }
     if (q.get('ref')) { $('refSel').value = q.get('ref'); $('refSel').dispatchEvent(new Event('change')); }

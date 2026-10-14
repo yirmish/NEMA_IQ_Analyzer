@@ -10,10 +10,11 @@ For every case a phantom is written as PET DICOM (digital_phantom.py) and analys
      decay correction, units and measured/expected activity are compared with the ground truth, and the contrast with
      the contrast of a sphere ROI centred on the true sphere centre (40 x 40 supersampling; end-to-end error, including
      the localisation and the discretisation of the ROI edge).
-  3. rule check: the ROI layout follows the NEMA rules against the true geometry: each sphere ROI on the slice nearest
-     the sphere centre; 12 background ROIs at >= 15 mm (or the reported reduced margin) from the phantom wall, the
-     spheres and the lung insert, on the central slice and at +-10 and +-20 mm; lung-residual slices outside the
-     exclusion zone at the insert ends (10 mm NU 2-2012, 30 mm NU 2-2018).
+  3. rule check: the ROI layout follows the NEMA rules against the true geometry: all sphere ROIs on the slice nearest
+     the sphere plane (default) or each on the slice nearest its own centre (slice_mode='per-sphere'); 12 background ROIs
+     at >= 15 mm (or the reported reduced margin) from the phantom wall, the spheres and the lung insert, on the central
+     slice and at +-10 and +-20 mm; lung-residual slices outside the exclusion zone at the insert ends (10 mm NU 2-2012,
+     30 mm NU 2-2018), and up to the FOV edge where the insert continues beyond it (unless lung_range='fov-edge').
 
 Usage: python tests/run_tests.py [--jobs N] [--only name,name] [--keep DIR] [--summary FILE]
 Requires Python 3 with numpy and scipy (tests/requirements.txt) and Node.js.
@@ -47,17 +48,28 @@ CASES = [
          phantom=dict(fill='2012', fwhm=6, noise=0.12, nrep=3, zoff=1.0, lung_act=0.10, seed=11), standard='2012', tol=NOISY),
     dict(name='nu2012_ratio8', desc='NU 2-2012 fill at 8:1, 6 mm PSF, noise',
          phantom=dict(fill='2012', ratio=8.0, fwhm=6, noise=0.10, zoff=1.0, seed=12), standard='2012', ratio=8.0, tol=NOISY),
-    dict(name='tilt3_offset', desc='axis tilted 3 deg, ring rotated 17 deg, 15/-20 mm off centre, noise',
+    dict(name='tilt3_offset', desc='axis tilted 3 deg, ring rotated 17 deg, 15/-20 mm off centre, noise, one ROI slice per sphere',
+         phantom=dict(tilt_deg=3, rot_deg=17, dx=15, dy=-20, fwhm=6, noise=0.10, lung_act=0.05, seed=13), tol=NOISY,
+         slice_mode='per-sphere', warnings=['sphere centres span']),
+    dict(name='tilt3_offset_common', desc='as tilt3_offset, one common sphere ROI slice (program default)',
          phantom=dict(tilt_deg=3, rot_deg=17, dx=15, dy=-20, fwhm=6, noise=0.10, lung_act=0.05, seed=13), tol=NOISY,
          warnings=['sphere centres span']),
     dict(name='no_lung_tilt4_mirrored', desc='no lung insert, tilt 4 deg, ring rotated -40 deg, reversed size order, noise',
          phantom=dict(lung=False, tilt_deg=4, rot_deg=-40, mirror=True, dx=-10, dy=10, fwhm=6, noise=0.10, seed=14), tol=NOISY,
-         warnings=['no lung insert detected', 'sphere centres span']),
+         slice_mode='per-sphere', warnings=['no lung insert detected', 'sphere centres span']),
     dict(name='voxel4mm_admin_implicit', desc='4 mm voxels, 8 mm PSF, noise, 2 replicates, decay ADMIN, Implicit VR',
          phantom=dict(px=4.0, dz=4.0, n=128, nz=50, fwhm=8, noise=0.10, nrep=2, decay='ADMIN', ts='implicit', zoff=2.0, seed=15),
          tol=COARSE),
     dict(name='voxel1.65mm_cnts', desc='1.65 mm voxels, 4 mm PSF, noise, Philips-style CNTS units with scale factor',
          phantom=dict(px=1.65, dz=1.65, n=220, nz=122, ss=3, fwhm=4, noise=0.10, units='CNTS', zoff=0.825, lung_act=0.05, seed=16), tol=NOISY),
+    dict(name='short_fov_2012', desc='15.7 cm axial FOV (48 x 3.27 mm), NU 2-2012 fill, lung insert leaves the FOV at one end, noise',
+         phantom=dict(dz=3.27, nz=48, fill='2012', fwhm=6, noise=0.10, nrep=3, lung_act=0.08, seed=18), standard='2012', tol=NOISY,
+         warnings=[]),
+    dict(name='short_fov_2012_fov_edge', desc='as short_fov_2012, lung exclusion also applied at the FOV edge (2.0.1 behaviour)',
+         phantom=dict(dz=3.27, nz=48, fill='2012', fwhm=6, noise=0.10, nrep=3, lung_act=0.08, seed=18), standard='2012', tol=NOISY,
+         lung_range='fov-edge', warnings=[]),
+    dict(name='long_fov_full_insert', desc='22 cm axial FOV, whole phantom inside the FOV (exclusion at both insert ends), noise',
+         phantom=dict(nz=110, zoff=20.0, fwhm=6, noise=0.10, lung_act=0.05, seed=19), tol=NOISY, warnings=[]),
     dict(name='no_spheres', desc='spheres filled like the background: the program must refuse the series',
          phantom=dict(ratio=1.0, fwhm=6, noise=0.05, seed=17), error='No NEMA IEC body-phantom sphere pattern'),
 ]
@@ -110,10 +122,11 @@ def axis_index(truth, k):
 
 
 def lung_end_slices(truth):
-    """Slice positions of the lung-insert ends on the axis, clipped to the scanned slices."""
+    """Slice positions of the lung-insert ends on the axis, clipped to the scanned slices, and whether each end lies
+    outside the scanned slices (the insert continues beyond the axial FOV)."""
     M, off, z0, P = np.array(truth['M']), np.array(truth['off']), truth['z0'], truth['params']
     e = sorted((M[2, 2] * w + off[2] - z0) / P['dz'] for w in truth['ends_mm'])
-    return max(e[0], -0.5), min(e[1], P['nz'] - 0.5)
+    return (max(e[0], -0.5), min(e[1], P['nz'] - 0.5)), (e[0] < -0.5, e[1] > P['nz'] - 0.5)
 
 
 def background_gaps(truth, R, px):
@@ -152,7 +165,8 @@ def run_case(case, workdir):
     std, ratio = case.get('standard', '2018'), case.get('ratio', 4.0)
     out = os.path.join(d, 'result.json')
     node = shutil.which('node') or 'node'
-    p = subprocess.run([node, os.path.join(HERE, 'analyse.js'), d, out, std, str(ratio)], capture_output=True, text=True)
+    slice_mode, lung_range = case.get('slice_mode', 'common'), case.get('lung_range', 'insert-ends')
+    p = subprocess.run([node, os.path.join(HERE, 'analyse.js'), d, out, std, str(ratio), slice_mode, lung_range], capture_output=True, text=True)
     fails, info = [], {}
 
     def check(ok, msg):
@@ -221,10 +235,14 @@ def run_case(case, workdir):
         check(abs(S['lung_mean'] - tl) <= T['lung_truth'], f"lung residual {S['lung_mean']:.3f} %, true {tl:.3f} %")
 
     # 3. rule check
-    for t in truth['spheres']:
-        q = sph[t['d']]
-        check(abs(q['slice'] - t['z']) <= 0.5 + T['loc_z'] / dz, f"{t['d']} mm sphere ROI on slice {q['slice']}, sphere centre at slice {t['z']:.2f}")
     zc = np.median([t['z'] for t in truth['spheres']])
+    if slice_mode == 'common':
+        ks = sorted({q['slice'] for q in R['spheres']})
+        check(len(ks) == 1 and abs(ks[0] - zc) <= 0.5 + T['loc_z'] / dz, f'sphere ROI slices {ks}, sphere plane at slice {zc:.2f} (one common slice)')
+    else:
+        for t in truth['spheres']:
+            q = sph[t['d']]
+            check(abs(q['slice'] - t['z']) <= 0.5 + T['loc_z'] / dz, f"{t['d']} mm sphere ROI on slice {q['slice']}, sphere centre at slice {t['z']:.2f}")
     offs = sorted((k - zc) * dz for k in R['rois']['bgSlices'])
     check(len(offs) == 5 and all(abs(o - e) <= dz / 2 + T['loc_z'] for o, e in zip(offs, [-20, -10, 0, 10, 20])),
           f'background slices at {[round(o, 1) for o in offs]} mm from the sphere plane (expected 0, +-10, +-20)')
@@ -238,11 +256,13 @@ def run_case(case, workdir):
     if truth['lung_present']:
         excl = 10.0 if std == '2012' else 30.0
         ks = [k for k, _, _ in R['rois']['lung']]
-        lo, hi = lung_end_slices(truth)
+        (lo, hi), cut = lung_end_slices(truth)
+        # where the insert continues beyond the FOV there is no insert end: no exclusion there unless lung_range='fov-edge'
+        e0, e1 = (0.0 if c and lung_range == 'insert-ends' else excl for c in cut)
         check(ks == list(range(ks[0], ks[-1] + 1)), 'lung-residual slices not contiguous')
         # no slice inside the exclusion zone (half a slice for the discrete end); at most 2 slices excluded in addition
-        check(lo + excl / dz - 0.5 <= ks[0] <= lo + excl / dz + 2 and hi - excl / dz - 2 <= ks[-1] <= hi - excl / dz + 0.5,
-              f'lung-residual slices {ks[0]}-{ks[-1]}; insert ends at slices {lo:.1f}/{hi:.1f}, exclusion {excl} mm')
+        check(lo + e0 / dz - 0.5 <= ks[0] <= lo + e0 / dz + 2 and hi - e1 / dz - 2 <= ks[-1] <= hi - e1 / dz + 0.5,
+              f'lung-residual slices {ks[0]}-{ks[-1]}; insert ends at slices {lo:.1f}/{hi:.1f} (beyond the FOV: {cut}), exclusion {e0}/{e1} mm')
     if 'warnings' in case:
         for w in case['warnings']:
             check(any(w in x for x in R['warnings']), f"missing warning '{w}'")
@@ -265,8 +285,11 @@ def main():
     work = os.path.abspath(a.keep) if a.keep else tempfile.mkdtemp(prefix='nema_phantoms_')
     os.makedirs(work, exist_ok=True)
     try:
-        with ProcessPoolExecutor(max_workers=a.jobs) as ex:
-            results = list(ex.map(run_case, cases, [work] * len(cases)))
+        if a.jobs > 1:
+            with ProcessPoolExecutor(max_workers=a.jobs) as ex:
+                results = list(ex.map(run_case, cases, [work] * len(cases)))
+        else:                                   # serial: no worker processes (e.g. where named pipes are not allowed)
+            results = [run_case(c, work) for c in cases]
     finally:
         if not a.keep:
             shutil.rmtree(work, ignore_errors=True)

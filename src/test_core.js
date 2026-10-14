@@ -1,6 +1,7 @@
 // Command-line check of the analysis core (no browser): runs the NEMA IQ analysis on a DICOM folder and prints the summary.
 // Usage: node test_core.js <DICOM folder> [2012|2018] [results.json] [SeriesDescription of one PET series]
-// Settings as in the program defaults: ratio 4.00, profile auto, one ROI slice per sphere, measured sphere types.
+// Settings as in the program defaults: ratio 4.00, profile auto, one common sphere ROI slice, lung exclusion at the insert
+// ends only, measured sphere types.
 const fs = require('fs'), path = require('path');
 require('./profiles.js');
 const N = require('./core.js');
@@ -21,7 +22,7 @@ const F = (v, d = 2) => v == null || !isFinite(v) ? '-' : v.toFixed(d);
   const files = walk(root).map(fileShim);
   const groups = await N.scanFiles(files, log);
   const seriesKeys = only ? groups.filter(g => g.info.modality !== 'PT' || g.info.desc === only).map(g => g.key) : undefined;
-  const res = await N.run(groups, { seriesKeys, standard, ratio: 4.0, profileId: 'auto', sliceMode: 'per-sphere', sphereTypes: 'detected', baseline: null }, log);
+  const res = await N.run(groups, { seriesKeys, standard, ratio: 4.0, profileId: 'auto', sliceMode: 'common', lungRange: 'insert-ends', sphereTypes: 'detected', baseline: null }, log);
   const S = res.summary;
   console.log('---- SUMMARY', S.standardName, S.recon_label, S.spec_name);
   res.geom.spheres.forEach((q, j) => console.log(`${q.d} ${q.type} Q=${F(S.contrast_mean[j])}±${F(S.contrast_sd[j])} ${S.contrast_status[j]}  BV=${F(S.bv_mean[j], 3)} ${S.bv_status[j]} slice=${q.slice} z=${q.z.toFixed(2)} x=${q.x.toFixed(2)} y=${q.y.toFixed(2)}`));

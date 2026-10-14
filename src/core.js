@@ -6,7 +6,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.1';
+N.VERSION = '2.0.2';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
@@ -1077,7 +1077,14 @@ N.placeBackgroundROIs = function (geom, ny, nx, px, log) {
   return { centres, info };
 };
 
-N.buildROIs = function (geom, dims, px, dz, std, log) {
+N.lungRuleText = function (li, std) {
+  if (!li) return `${std.lungExcl} mm at the insert ends`;
+  const cut = li.fov_cut[0] || li.fov_cut[1], nonStd = li.excl_mm !== li.standard_excl_mm ? ` (${std.name}: ${li.standard_excl_mm} mm)` : '';
+  return `${li.excl_mm} mm at the insert end${cut ? '' : 's'}${nonStd}` + (cut ? (li.range === 'insert-ends' ? '; insert continues beyond the FOV: slices up to the FOV edge used'
+    : `; ${li.excl_mm} mm also at the FOV edge`) : '');
+};
+
+N.buildROIs = function (geom, dims, px, dz, std, log, opts = {}) {
   const { nz, ny, nx } = dims, iz0 = geom.iz0;
   const sphere = geom.spheres.map(q => new ROI(q.slice, q.x, q.y, q.d, px, ny, nx, 'S' + q.d));
   const { centres, info } = N.placeBackgroundROIs(geom, ny, nx, px, log);
@@ -1088,16 +1095,27 @@ N.buildROIs = function (geom, dims, px, dz, std, log) {
   });
   const bg = {};
   for (const d of SPHERE_D) bg[d] = bgSlices.map(k => centres.map(c => new ROI(k, c[0], c[1], d, px, ny, nx, 'B' + d)));
-  const excl = std.lungExcl, lungSlices = [];
-  let lung = [];
+  /* Lung residual: slices within the exclusion distance (NU 2-2012: 10 mm, NU 2-2018: 30 mm) of the ends of the lung
+     insert are excluded. Where the insert continues beyond the first or last image slice (short axial FOV), that end of
+     the slice range is the edge of the FOV, not an end of the insert: by default ('insert-ends') no slices are excluded
+     there (this reproduces the GE NEMA software results); 'fov-edge' applies the exclusion there too (the 2.0.0/2.0.1 behaviour). */
+  const excl = opts.lungExclMm != null ? opts.lungExclMm : std.lungExcl, lungRange = opts.lungRange === 'fov-edge' ? 'fov-edge' : 'insert-ends';
+  const lungSlices = [];
+  let lung = [], lungInfo = null;
   if (geom.lung_present) {
     const [zl0, zl1] = geom.lung_z;
-    for (let k = 0; k < nz; k++) if ((k - zl0) * dz >= excl && (zl1 - k) * dz >= excl) lungSlices.push(k);
+    const cut = [zl0 <= 0.5, zl1 >= nz - 1.5];          // insert still present at the first / last image slice
+    const ex = cut.map(c => c && lungRange === 'insert-ends' ? 0 : excl);
+    for (let k = 0; k < nz; k++) if ((k - zl0) * dz >= ex[0] && (zl1 - k) * dz >= ex[1]) lungSlices.push(k);
     if (!lungSlices.length) throw new Error('No slices left for the lung residual');
     lung = lungSlices.map(k => { const [x, y] = geom.lungXY(k); return new ROI(k, x, y, LUNG_ROI_D, px, ny, nx, 'L'); });
-    log.info(`lung residual on ${lungSlices.length} slices (${lungSlices[0]}-${lungSlices[lungSlices.length - 1]}), excluding ${excl} mm at the insert ends (${std.name})`);
+    lungInfo = { range: lungRange, excl_mm: excl, standard_excl_mm: std.lungExcl, fov_cut: cut, excl_applied_mm: ex };
+    if (excl !== std.lungExcl) log.warn(`lung-residual exclusion set to ${excl} mm at the insert ends; ${std.name} specifies ${std.lungExcl} mm`);
+    log.info(`lung residual on ${lungSlices.length} slices (${lungSlices[0]}-${lungSlices[lungSlices.length - 1]}), excluding ${excl} mm at the insert end(s)` +
+      (cut[0] || cut[1] ? `; the insert continues beyond the ${cut[0] && cut[1] ? 'first and last' : cut[0] ? 'first' : 'last'} image slice, ` +
+        (lungRange === 'insert-ends' ? 'slices up to the FOV edge are included there' : `the ${excl} mm exclusion is applied at the FOV edge as well`) : ''));
   }
-  return { sphere, bg, bgCentres: centres, bgSlices, lung, lungSlices, bgInfo: info };
+  return { sphere, bg, bgCentres: centres, bgSlices, lung, lungSlices, lungInfo, bgInfo: info };
 };
 
 // =====================================================================================
@@ -1196,9 +1214,14 @@ function specStatus(v, lim, kind) {
 // =====================================================================================
 /* opts: {standard:'2018'|'2012', ratio (actual sphere:background ratio), profileId:'auto'|<profile id>|'none', referenceId,
           limits (see N.normLimits; null = no PASS/FAIL), baseline (baseline JSON), volumeMl, seriesKeys, reconLabel, seriesFilter,
-          sliceMode:'per-sphere'|'common', sphereTypes:'detected'|'standard'} */
+          sliceMode:'common' (default)|'per-sphere', sphereTypes:'detected'|'standard',
+          lungRange:'insert-ends' (default: exclusion only at the ends of the lung insert)|'fov-edge' (exclusion also where the
+          insert continues beyond the axial FOV), lungExclMm (exclusion distance in mm; null = the standard's 10 / 30 mm)} */
 N.run = async function (groups, opts, log, progress) {
   progress = progress || (async () => {});
+  const xl = opts.lungExclMm == null || opts.lungExclMm === '' ? null : +opts.lungExclMm;
+  opts = Object.assign({}, opts, { sliceMode: opts.sliceMode === 'per-sphere' ? 'per-sphere' : 'common',
+    lungRange: opts.lungRange === 'fov-edge' ? 'fov-edge' : 'insert-ends', lungExclMm: xl != null && isFinite(xl) && xl >= 0 ? xl : null });
   const std = N.STANDARDS[opts.standard || '2018'];
   const allRecons = N.reconGroups(groups);
   if (opts.seriesKeys) groups = groups.filter(g => g.info.modality !== 'PT' || opts.seriesKeys.includes(g.key));
@@ -1244,7 +1267,7 @@ N.run = async function (groups, opts, log, progress) {
   const vm = new Float32Array(p0.img.length);
   for (const p of pets) { const im = p.img; for (let i = 0; i < vm.length; i++) vm[i] += im[i] / pets.length; }
   await progress(0.5, 'Localising the phantom (body, lung insert, spheres)');
-  const geom = N.localize(vm, dims, px, dz, { sliceMode: opts.sliceMode || 'per-sphere' }, log);
+  const geom = N.localize(vm, dims, px, dz, { sliceMode: opts.sliceMode }, log);
   geom.z_mm = Array.from(p0.z);
 
   // sphere types: measured fill checked against the selected standard
@@ -1266,7 +1289,7 @@ N.run = async function (groups, opts, log, progress) {
   }
 
   await progress(0.7, 'Placing ROIs');
-  const rois = N.buildROIs(geom, dims, px, dz, std, log);
+  const rois = N.buildROIs(geom, dims, px, dz, std, log, { lungRange: opts.lungRange, lungExclMm: opts.lungExclMm });
 
   await progress(0.78, 'Measuring replicates');
   const volumeMl = opts.volumeMl || metas[0].TracerVolume_ml || null, ratio = opts.ratio || 4.0;

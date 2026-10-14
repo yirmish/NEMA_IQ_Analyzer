@@ -137,7 +137,10 @@
       <label class="k">Background volume [mL]</label>
       <div><input type="number" id="volMl" placeholder="from DICOM (tracer volume)" step="1"> <span class="hint">used only for the expected activity concentration</span></div>
       <label class="k">Sphere ROI slice</label>
-      <div><select id="sliceSel"><option value="per-sphere">Central slice of each sphere (recommended; robust to phantom tilt)</option><option value="common">One common central slice</option></select></div>
+      <div><select id="sliceSel"><option value="common">One common central slice through the spheres (recommended; as in the standard, matches the GE NEMA software)</option><option value="per-sphere">Central slice of each sphere (for a tilted phantom)</option></select></div>
+      <label class="k">Lung-residual slices</label>
+      <div><select id="lungSel"><option value="insert-ends">Exclude slices near the lung-insert ends only (recommended; matches the GE NEMA software)</option><option value="fov-edge">Also exclude slices near the FOV edge where the insert continues beyond it (2.0.1 behaviour)</option></select>
+        <input type="number" id="lungExcl" placeholder="exclusion [mm]" step="1" min="0"> <span class="hint">empty = standard: 10 mm (NU 2-2012), 30 mm (NU 2-2018)</span></div>
       <label class="k">Sphere type (hot / cold)</label>
       <div><select id="typeSel"><option value="detected">As measured in the image; deviations from the standard are flagged (recommended)</option>
         <option value="standard">As required by the selected standard</option></select></div>
