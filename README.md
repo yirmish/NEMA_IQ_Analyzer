@@ -46,7 +46,8 @@ An example report of an anonymised phantom study is in [`docs/example_report.pdf
   (checked against the selected edition). Each sphere ROI is placed on that sphere's own central slice (or one common slice).
 * **ROIs:** sphere ROIs with the sphere inner diameter; 12 background ROIs of each diameter on 5 slices (0, ±1, ±2 cm).
   The NEMA 15 mm wall/sphere margin is reduced in 0.5 mm steps when 12 non-overlapping 37 mm ROIs do not fit; the report
-  says so. Lung ROI 30 mm on every slice outside the exclusion zone. ROI means use fractional (sub-pixel) weights.
+  says so. The wall is located with sub-pixel precision (50 % of the background in the smoothed image). Lung ROI 30 mm on
+  every slice outside the exclusion zone. ROI means use fractional (sub-pixel) weights.
 * **Formulas:** Q<sub>H</sub> = (C<sub>H</sub>/C<sub>B</sub> − 1)/(a<sub>H</sub>/a<sub>B</sub> − 1) × 100;
   Q<sub>C</sub> = (1 − C<sub>C</sub>/C<sub>B</sub>) × 100; BV = SD/C<sub>B</sub> × 100 over 60 ROIs (K − 1);
   lung error = C<sub>lung</sub>/C<sub>B,37</sub> × 100, averaged over slices; results are the mean (± SD) over replicates.
@@ -124,6 +125,8 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
 | `SOURCES.md` | the documents behind the analysis rules and the published sources of every profile value |
 | `src/` | source code: `core.js` (DICOM reader and analysis), `report.js` (report), `ui.js` (interface), `template.html`, `profiles.js` (generated), `build.py`, `make_sources.py`, `test_core.js` |
 | `docs/` | example report (PDF) and page images of an anonymised phantom study |
+| `tests/` | verification on digital phantoms with known ground truth (see *Tests*) |
+| `.github/workflows/tests.yml` | continuous integration: rebuild and checksum check, digital-phantom tests |
 | `CHANGELOG.md`, `LICENSE`, `CITATION.cff` | release notes, MIT licence, citation metadata |
 | `SHA256SUMS.txt` | SHA-256 checksums of all files |
 
@@ -140,7 +143,8 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
   Python implementation (contrast within 0.01 percentage points), and with the manufacturer's IQ tool within −0.6 to
   +1.3 points when the manufacturer's slice and ROIs are used. The Siemens and Philips DICOM conventions (units, scale
   factors, decay correction, model names) were implemented from the conformance statements and tested on modified
-  copies of GE images only. **Test the program on your own data before routine use.**
+  copies of GE images only. The analysis is also verified on digital phantoms with known ground truth (see *Tests*),
+  which test the software, not the behaviour of a real scanner. **Test the program on your own data before routine use.**
 
 ## Building from source
 
@@ -148,6 +152,31 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
 `NEMA_IQ_Analyzer.html`. `python src/make_sources.py` regenerates `SOURCES.md`.
 `node src/test_core.js <DICOM folder> [2012|2018] [results.json] [series description]` runs the analysis without a
 browser (Node.js; tested with version 26).
+
+## Tests
+
+`python tests/run_tests.py` (Python 3 with numpy and scipy: `pip install -r tests/requirements.txt`; Node.js) writes
+digital IEC body phantoms as PET DICOM (`tests/digital_phantom.py`), analyses them with the analysis core
+(`tests/analyse.js`) and checks the results in three ways:
+
+* **Measurement:** an independent implementation of the ROI statistics, applied to the same images at the program's ROI
+  positions, must give the same contrast, background variability and lung residual (to rounding).
+* **Truth:** sphere identification, hot/cold type, sphere centres, phantom tilt, background concentration, decay
+  correction, units and measured/expected activity against the known values; contrast against a sphere ROI centred on
+  the true sphere centre.
+* **Rules:** each sphere ROI on the slice nearest its centre; 12 background ROIs at the required distance from wall,
+  spheres and lung insert on the central slice and at ±10 and ±20 mm; lung-residual slices outside the exclusion zone of
+  the selected edition.
+
+The cases cover NU 2-2012 and 2018 fills, 4:1 and 8:1, with and without lung insert, tilt, offset and rotation, reversed
+sphere order, 1.65-4 mm voxels, noise, replicates, decay correction START and ADMIN, Philips CNTS units, Implicit VR
+files and a series without spheres (must be refused). The digital phantom has no sphere walls and uses Gaussian noise
+instead of reconstructed noise.
+
+GitHub Actions (`.github/workflows/tests.yml`) runs these tests on every push and pull request, and checks that
+`NEMA_IQ_Analyzer.html`, `src/profiles.js` and `SOURCES.md` are rebuilt identically from the sources and that
+`SHA256SUMS.txt` matches all tracked files. After changing files, regenerate the checksums with
+`git ls-files | grep -vx SHA256SUMS.txt | LC_ALL=C sort | xargs sha256sum > SHA256SUMS.txt`.
 
 ## Contributing
 

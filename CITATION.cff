@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
 title: "NEMA IQ Analyzer"
-version: "2.0.0"
-date-released: "2026-09-26"
+version: "2.0.1"
+date-released: "2026-10-13"
 license: MIT
 authors:
   - name: "The NEMA IQ Analyzer authors"
