@@ -11,8 +11,9 @@ NU 2-2012 fill, 3 scans each). Contrast and background variability are otherwise
   ROI on its own central slice by default; this remains available (*Central slice of each sphere*, `sliceMode:
   'per-sphere'`). Where the sphere centres span 2.7 mm axially, per-sphere slices put three spheres on the next slice and
   single-scan contrast differed from GE by up to 11.9 points; with one common slice by at most 3.7 points (hot) and
-  0.4 points (cold), within GE's own scan-to-scan SD. Results change only where the sphere centres round to different
-  slices (e.g. GE Omni Legend, 2026 test: 28/37 mm cold contrast +0.4/−1.7 points, hot spheres unchanged).
+  0.4 points (cold), comparable to GE's own scan-to-scan SD (3.3 points). Results change only where the sphere
+  centres round to different slices (e.g. GE Omni Legend, 2026 test: 28/37 mm cold contrast +0.4/−1.7 points, hot
+  spheres unchanged).
 - Lung residual: new option *Lung-residual slices* (`lungRange`). **Default `'insert-ends'`**: the 10 / 30 mm exclusion
   applies at the ends of the lung insert only; where the insert continues beyond the first or last image slice (axial
   FOV shorter than the phantom), slices up to the FOV edge are used. 2.0.0/2.0.1 applied the exclusion at the FOV edge as
@@ -31,8 +32,7 @@ NU 2-2012 fill, 3 scans each). Contrast and background variability are otherwise
 
 ### Documentation
 - README: new settings, calculation conventions and the comparison with the GE NEMA software.
-- The example report in `docs/` was not regenerated and still shows 2.0.1 output (per-sphere slices); regenerate it
-  with `python docs/make_example.py`.
+- Example report in `docs/` regenerated with 2.0.2 (one common sphere slice; lung slices up to the FOV edge).
 
 ## 2.0.1 — 2026-10-14
 
