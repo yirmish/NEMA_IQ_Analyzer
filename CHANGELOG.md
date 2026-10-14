@@ -1,10 +1,16 @@
 # Changelog
 
-## Unreleased
+## 2.0.4 — 2026-10-14
 
-### Repository
-- The release workflow also attaches `demo/NEMA_IQ_demo_digital_phantom.zip` and starts the notes with the links to
-  the online demo. Run again for a released version, it adds the files that are missing from that release.
+Packaging release: the program and the analysis are unchanged (results identical to 2.0.2 and 2.0.3).
+
+### Release
+- The demo dataset `NEMA_IQ_demo_digital_phantom.zip` is attached to the release, next to `NEMA_IQ_Analyzer.html` and
+  `SHA256SUMS.txt`. Releases of this repository are immutable (files cannot be added after publication), so 2.0.3
+  could not receive it.
+- The release workflow attaches the demo ZIP and starts the release notes with the links to the online demo. Run again
+  for an existing version, it adds missing files only to a release that is still mutable and otherwise stops with a
+  message.
 
 ## 2.0.3 — 2026-10-14
 

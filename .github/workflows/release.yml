@@ -3,7 +3,8 @@ name: release
 # Creates the tag v<version> and a GitHub release with NEMA_IQ_Analyzer.html, SHA256SUMS.txt and the demo dataset
 # (demo/NEMA_IQ_demo_digital_phantom.zip), after the tests pass and the version and release date agree in src/core.js,
 # NEMA_IQ_Analyzer.html, CITATION.cff and CHANGELOG.md. Start it from the Actions tab on main (version x.y.z), or push
-# the tag vx.y.z. Run again for a version that is already released, it adds the missing files (taken from the tag).
+# the tag vx.y.z. Run again for a version that is already released, it adds the missing files (taken from the tag) to a
+# release that is still mutable; immutable releases (repository setting) cannot be changed and need a new version.
 on:
   workflow_dispatch:
     inputs:
@@ -54,6 +55,9 @@ jobs:
         run: |
           assets=(NEMA_IQ_Analyzer.html SHA256SUMS.txt demo/NEMA_IQ_demo_digital_phantom.zip)
           if gh release view "v$VERSION" > /dev/null 2>&1; then
+            if [ "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/v$VERSION" --jq .immutable)" = true ]; then
+              echo "::error::release v$VERSION is immutable: files cannot be added after publication; release a new version"; exit 1
+            fi
             git fetch --depth=1 origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
             have=$(gh release view "v$VERSION" --json assets --jq '.assets[].name')
             mkdir -p "$RUNNER_TEMP/assets"

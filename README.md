@@ -232,7 +232,8 @@ GitHub Actions (`.github/workflows/tests.yml`) runs these tests on every push an
 2. Run the *release* workflow (Actions → release → Run workflow on `main`, version `x.y.z`) or push the tag `vx.y.z`.
    It runs the tests, checks that version and date agree in all files, creates the tag and a GitHub release with the
    notes from `CHANGELOG.md` and `NEMA_IQ_Analyzer.html`, `SHA256SUMS.txt` and the demo ZIP attached. Run again for
-   a version that is already released, it attaches the missing files from the tag (existing files are not replaced).
+   a version that is already released, it attaches the missing files from the tag (existing files are not replaced);
+   releases are immutable once published (repository setting), so a missing file then needs a new version.
 
 ## Contributing
 
