@@ -1,0 +1,51 @@
+name: release
+
+# Creates the tag v<version> and a GitHub release with NEMA_IQ_Analyzer.html and SHA256SUMS.txt, after the tests pass
+# and the version and release date agree in src/core.js, NEMA_IQ_Analyzer.html, CITATION.cff and CHANGELOG.md.
+# Start it from the Actions tab on main (version x.y.z), or push the tag vx.y.z.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, e.g. 2.0.1'
+        required: true
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  release:
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      REQUESTED: ${{ inputs.version || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version and release date
+        run: |
+          v="${REQUESTED#v}"
+          fail() { echo "::error::$1"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] && [ "$GITHUB_REF" != refs/heads/main ]; then fail "run the release from main"; fi
+          grep -qF "N.VERSION = '$v';" src/core.js || fail "src/core.js: N.VERSION is not $v"
+          grep -qF "N.VERSION = '$v';" NEMA_IQ_Analyzer.html || fail "NEMA_IQ_Analyzer.html is not built from version $v"
+          grep -qx "version: \"$v\"" CITATION.cff || fail "CITATION.cff: version is not $v"
+          date=$(sed -n "s/^## $v — \([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)\$/\1/p" CHANGELOG.md)
+          [ -n "$date" ] || fail "CHANGELOG.md: no section '## $v — YYYY-MM-DD'"
+          grep -qx "date-released: \"$date\"" CITATION.cff || fail "CITATION.cff: date-released is not $date (CHANGELOG.md)"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+      - name: Release notes from CHANGELOG.md
+        run: awk -v h="## $VERSION " 'index($0, h) == 1 {f = 1; next} f && /^## / {exit} f' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then target=(--target "$GITHUB_SHA"); else target=(--verify-tag); fi
+          gh release create "v$VERSION" NEMA_IQ_Analyzer.html SHA256SUMS.txt "${target[@]}" \
+            --title "NEMA IQ Analyzer $VERSION" --notes-file "$RUNNER_TEMP/notes.md"
