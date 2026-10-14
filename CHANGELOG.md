@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.1 — unreleased
+## 2.0.1 — 2026-10-14
 
 ### Analysis
 - Background ROIs: the distance from the phantom wall is measured to the wall located with sub-pixel precision (50 % of
@@ -14,6 +14,13 @@
 - Digital IEC body phantoms with known ground truth (`tests/`): measurement, truth and rule checks on 9 cases (NU 2-2012
   and 2018 fills, 8:1, no lung insert, tilt, 1.65-4 mm voxels, noise, replicates, START/ADMIN, CNTS, Implicit VR).
 - GitHub Actions: digital-phantom tests, rebuild check of the HTML, `profiles.js` and `SOURCES.md`, checksum check.
+
+### Documentation and release
+- Example report (`docs/`) regenerated with 2.0.1 from a digital IEC body phantom (NU 2-2012 fill, lung insert,
+  3 replicates); `docs/make_example.py` reproduces it by running the program in headless Chromium. The 2.0.0 example
+  (anonymised clinical phantom study) remains in the git history (commit ec56eac).
+- Release workflow (`.github/workflows/release.yml`): tests, version/date consistency check, tag and GitHub release
+  with `NEMA_IQ_Analyzer.html` and `SHA256SUMS.txt`.
 
 ## 2.0.0 — 2026-09-26 (first public release)
 

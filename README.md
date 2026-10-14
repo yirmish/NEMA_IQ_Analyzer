@@ -11,13 +11,14 @@ A single, self-contained HTML file (`NEMA_IQ_Analyzer.html`) for the analysis of
 > **Not a medical device.** This software is provided for quality-assurance work by qualified medical physicists, without
 > warranty of any kind. Verify the results, and follow the manufacturer's test procedure and acceptance criteria.
 
-![Summary page of an example report (anonymised phantom study, NU 2-2012)](docs/example_summary.png)
+![Summary page of an example report (digital IEC body phantom, NU 2-2012 fill, 3 replicates)](docs/example_summary.png)
 
 ## Download
 
 The program is the single file [`NEMA_IQ_Analyzer.html`](NEMA_IQ_Analyzer.html): download it (on GitHub: open the file,
 then *Download raw file*, or take it from the *Releases* page) and open it in the browser. Nothing else is needed.
-An example report of an anonymised phantom study is in [`docs/example_report.pdf`](docs/example_report.pdf).
+An example report is in [`docs/example_report.pdf`](docs/example_report.pdf). It was produced from a digital IEC body
+phantom (no patient or site data) with `python docs/make_example.py`, which runs the program in a headless browser.
 `SHA256SUMS.txt` lists the checksums of all files of the release.
 
 ## Quick start
@@ -124,9 +125,9 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
 | `templates/profile_template.json` | format for additional scanner profiles (load with *Load profile JSON…*) |
 | `SOURCES.md` | the documents behind the analysis rules and the published sources of every profile value |
 | `src/` | source code: `core.js` (DICOM reader and analysis), `report.js` (report), `ui.js` (interface), `template.html`, `profiles.js` (generated), `build.py`, `make_sources.py`, `test_core.js` |
-| `docs/` | example report (PDF) and page images of an anonymised phantom study |
+| `docs/` | example report (PDF) and page images of a digital phantom; `make_example.py` / `render_example.js` regenerate them |
 | `tests/` | verification on digital phantoms with known ground truth (see *Tests*) |
-| `.github/workflows/tests.yml` | continuous integration: rebuild and checksum check, digital-phantom tests |
+| `.github/workflows/` | `tests.yml`: rebuild and checksum check, digital-phantom tests; `release.yml`: tag and GitHub release |
 | `CHANGELOG.md`, `LICENSE`, `CITATION.cff` | release notes, MIT licence, citation metadata |
 | `SHA256SUMS.txt` | SHA-256 checksums of all files |
 
@@ -177,6 +178,15 @@ GitHub Actions (`.github/workflows/tests.yml`) runs these tests on every push an
 `NEMA_IQ_Analyzer.html`, `src/profiles.js` and `SOURCES.md` are rebuilt identically from the sources and that
 `SHA256SUMS.txt` matches all tracked files. After changing files, regenerate the checksums with
 `git ls-files | grep -vx SHA256SUMS.txt | LC_ALL=C sort | xargs sha256sum > SHA256SUMS.txt`.
+
+## Releasing
+
+1. Set the version in `src/core.js` (`N.VERSION`) and `CITATION.cff`, date the section in `CHANGELOG.md`
+   (`## x.y.z — YYYY-MM-DD`) and `date-released` in `CITATION.cff`, rebuild (`python src/build.py`) and regenerate
+   `SHA256SUMS.txt`. Merge to `main`.
+2. Run the *release* workflow (Actions → release → Run workflow on `main`, version `x.y.z`) or push the tag `vx.y.z`.
+   It runs the tests, checks that version and date agree in all files, creates the tag and a GitHub release with the
+   notes from `CHANGELOG.md` and `NEMA_IQ_Analyzer.html` and `SHA256SUMS.txt` attached.
 
 ## Contributing
 
