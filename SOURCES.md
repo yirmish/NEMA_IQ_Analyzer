@@ -15,7 +15,7 @@
 
 # Sources of the built-in scanner profiles
 
-Generated from `scanner_profiles.json` by `make_sources.py`. Published values are shown in the report for **comparison only**; they are not acceptance limits. Values were copied from the cited table or text of each source; entries marked *provisional* come from a secondary source.
+Generated from `scanner_profiles.json` by `make_sources.py`. Published values are shown in the report for **comparison only**; they are not acceptance limits. Values were copied from the cited table or text of each source; entries marked *provisional* come from a secondary source or could not be checked against the final publication.
 
 ## Siemens Biograph mCT (TrueV, 4 rings, 22.1 cm)
 
@@ -157,6 +157,38 @@ Generated from `scanner_profiles.json` by `make_sources.py`. Published values ar
 - Published NEMA IQ protocol: scan time [212, 217, 222] s, replicates 3, recon method VPFX, matrix 384x384, iterations 4, subsets 24, filter_mm 2.0 — Chicheportiche et al. EJNMMI Phys 2020;7:4, p4-5 (citing the GE Discovery MI DR NEMA test procedure)
 - Notes: Identification and protocol only: published per-sphere values are shown in figures only (Chicheportiche 2020) or paywalled (Michopoulou 2019).
 - No published per-sphere NEMA IQ values found.
+
+## GE Omni Legend (16 cm)
+
+- Profile id: `ge-omni-legend-16`; DICOM match: Manufacturer `/^GE\b|GE MEDICAL|GE HEALTH/i`, Model `/Omni\s*Legend/i`
+- Axial FOV: 16 cm; variant: 16 cm axial FOV (FDA 510(k) K241665)
+- ManufacturerModelName values listed in the headers of the 32 cm system (assumed the same for this configuration, because the axial FOV is not part of the model name): `Omni Legend`
+- Notes: Identification only: no published per-sphere NEMA IQ values were found for the 16 cm configuration. It is chosen over the 32 cm profile by the GE axial-FOV tag; the tag value of this configuration has not been checked on real images.
+- No published per-sphere NEMA IQ values found.
+
+## GE Omni Legend (21 cm)
+
+- Profile id: `ge-omni-legend-21`; DICOM match: Manufacturer `/^GE\b|GE MEDICAL|GE HEALTH/i`, Model `/Omni\s*Legend/i`
+- Axial FOV: 21 cm; variant: 21 cm axial FOV (FDA 510(k) K241665)
+- ManufacturerModelName values listed in the headers of the 32 cm system (assumed the same for this configuration, because the axial FOV is not part of the model name): `Omni Legend`
+- Notes: Identification only: no published per-sphere NEMA IQ values were found for the 21 cm configuration. It is chosen over the 32 cm profile by the GE axial-FOV tag; the tag value of this configuration has not been checked on real images.
+- No published per-sphere NEMA IQ values found.
+
+## GE Omni Legend (32 cm)
+
+- Profile id: `ge-omni-legend-32`; DICOM match: Manufacturer `/^GE\b|GE MEDICAL|GE HEALTH/i`, Model `/Omni\s*Legend/i`
+- Axial FOV: 32 cm; variant: 32 cm axial FOV (16, 21 and 32 cm configurations exist: FDA 510(k) K241665)
+- ManufacturerModelName values listed in the PET DICOM headers of an Omni Legend 32 cm system (software pet_omni.42; no public Omni Legend DICOM found): `Omni Legend`
+- Published NEMA IQ protocol: replicates 3, recon method VPHD, matrix 384x384, iterations 6, subsets 22, filter_mm 2.0 — Smith et al. Biomed Phys Eng Express 2024;10:025032 (preprint arXiv:2308.06255, Sec. 2.7): VPHD 384x384, 6 iterations, 22 subsets, 2 mm Gaussian filter; three acquisitions, the first 7 min, the next two prolonged for decay (durations not stated)
+- Published limits (opt-in): GE specification, Omni Legend 32 cm, NU 2-2018 (as reproduced by Smith et al. 2024): contrast [30, 40, 50, 60, 60, 60] (hot/hot/hot/hot/hot/hot), BV [12, 10, 9, 7, 6, 5], lung 19 — Smith et al. 2024 (doi 10.1088/2057-1976/ad286c), Table 5 'Specified Contrast' / 'Specified Background' / lung error (preprint arXiv:2308.06255 numbering)
+  - All six spheres hot (NU 2-2018). The table gives the specification beside the VPHD, Q.Clear and PDL results without naming the reconstruction it applies to; the paper's IQ protocol is VPHD 6 it / 22 subsets / 2 mm. Contrast >= and background variability and lung error <= the specified values (table note). Transcribed from the preprint; the same numbers are quoted for the Discovery IQ by Jha et al. 2019.
+- Notes: Digital BGO (SiPM readout), no time of flight. The model name does not encode the axial FOV; the GE private axial-FOV tag (GEMS_PETD_01 0009,xx2C, 317 mm on a 32 cm system) selects between the 16, 21 and 32 cm profiles. References and published limits: Smith et al. 2024, values transcribed from the authors' open preprint (Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. arXiv:2308.06255v1, 2023), Table 5; the peer-reviewed article (CC BY 4.0) could not be retrieved for checking. Its abstract gives the same VPHD range (52.7 +/- 3.2 % at 10 mm to 92.5 +/- 2.4 % at 37 mm, mean of three acquisitions). Yamagishi et al. (J Nucl Med 2023;64:1990-1997, doi 10.2967/jnumed.123.266140) report for Q.Clear beta 50 a contrast of 61.3-93.0 %, background variability 5.4-11.7 % and lung error 5.1 % (abstract; per-sphere table not retrieved).
+
+| Reference set | Standard | Ratio | Recon | Source (table) |
+|---|---|---|---|---|
+| VPHD 6i22s, 2 mm, 4:1 (Smith 2024) - provisional | NEMA NU 2-2018 | 4.0:1 | VPHD (3D OSEM), 6 iterations x 22 subsets, 2 mm Gaussian filter, 384x384 | Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032 https://doi.org/10.1088/2057-1976/ad286c (Table 5 (preprint numbering)) |
+| Q.Clear beta 500, 4:1 (Smith 2024) - provisional | NEMA NU 2-2018 | 4.0:1 | Q.Clear (BSREM), beta 500 | Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032 https://doi.org/10.1088/2057-1976/ad286c (Table 5 (preprint numbering)) |
+| Precision DL medium on Q.Clear beta 500, 4:1 (Smith 2024) - provisional | NEMA NU 2-2018 | 4.0:1 | Precision DL (PDL, medium strength) applied to Q.Clear beta 500 images | Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032 https://doi.org/10.1088/2057-1976/ad286c (Table 5 (preprint numbering)) |
 
 ## Not found in public sources (at compilation)
 

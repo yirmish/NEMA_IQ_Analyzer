@@ -268,7 +268,7 @@ function refTable(res) {
   let t = `<h3>Published reference (comparison only)</h3><table class="t small"><thead><tr><th>D</th><th>ref. type</th><th>Q ref [%]</th><th>Q here</th><th>BV ref [%]</th><th>BV here</th></tr></thead><tbody>`;
   N.SPHERE_D.forEach((d, j) => t += `<tr><td>${d}</td><td>${esc(R_.sphere_types[j] || '-')}</td><td>${f(R_.contrast[j])}</td><td>${f(S.contrast_mean[j])}</td><td>${f(R_.bv[j], 2)}</td><td>${f(S.bv_mean[j], 2)}</td></tr>`);
   t += `<tr class="sep"><td colspan="2">lung</td><td colspan="2">${R_.lung == null ? '-' : f(R_.lung, 1) + ' %'}</td><td colspan="2">${S.lung_mean == null ? 'not measured' : f(S.lung_mean, 2) + ' %'}</td></tr></tbody></table>`;
-  t += `<div class="small">${R_.provisional ? '<b>Provisional (secondary source).</b> ' : ''}${esc(R_.citation)}${R_.doi ? ` (${esc(R_.doi)})` : ''}${R_.table ? `, ${esc(R_.table)}` : ''}. ${R_.standard ? esc(R_.standard) + '; ' : ''}${R_.ratio ? `ratio ${R_.ratio}:1; ` : ''}${R_.variant ? esc(R_.variant) + '; ' : ''}recon: ${esc(R_.recon || '-')}; acquisition: ${esc(R_.acquisition || '-')}.
+  t += `<div class="small">${R_.provisional ? '<b>Provisional (secondary or unverified source).</b> ' : ''}${esc(R_.citation)}${R_.doi ? ` (${esc(R_.doi)})` : ''}${R_.table ? `, ${esc(R_.table)}` : ''}. ${R_.standard ? esc(R_.standard) + '; ' : ''}${R_.ratio ? `ratio ${R_.ratio}:1; ` : ''}${R_.variant ? esc(R_.variant) + '; ' : ''}recon: ${esc(R_.recon || '-')}; acquisition: ${esc(R_.acquisition || '-')}.
     Published values depend on acquisition, reconstruction and phantom preparation; they are not acceptance limits.</div>`;
   return t;
 }

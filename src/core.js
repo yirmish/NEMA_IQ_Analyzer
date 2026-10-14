@@ -6,7 +6,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.4';
+N.VERSION = '2.0.5';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
@@ -1441,7 +1441,7 @@ N.run = async function (groups, opts, log, progress) {
                     contrast: pick('contrast_pct'), bv: pick('bv_pct'), lung: ref.lung_residual_pct == null ? null : +ref.lung_residual_pct, sphere_types: rtype,
                     ratio: ref.ratio == null ? null : +ref.ratio, provisional: !!ref.provisional, table: ref.table || '', notes: ref.notes || '' };
     if (S.reference.ratio && Math.abs(S.reference.ratio - ratio) > 0.25) log.warn(`published reference was measured at ${S.reference.ratio}:1, this fill is ${ratio.toFixed(2)}:1 - hot-sphere contrast is not directly comparable`);
-    if (S.reference.provisional) log.warn('published reference is marked provisional (secondary source); see the profile notes');
+    if (S.reference.provisional) log.warn('published reference is marked provisional (secondary or unverified source); see the profile notes');
     const mismatch = SPHERE_D.filter((d, j) => rtype[j] && rtype[j] !== geom.spheres[j].type);
     if (mismatch.length) log.info(`published reference has different sphere types for ${mismatch.join(', ')} mm: no comparison for these spheres`);
     S.delta_ref_contrast = S.contrast_mean.map((m, j) => S.reference.contrast[j] == null || (rtype[j] && rtype[j] !== geom.spheres[j].type) ? null : m - S.reference.contrast[j]);
