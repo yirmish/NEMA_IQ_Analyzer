@@ -9,6 +9,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NEMA IQ Analyzer</title>
+<meta name="description" content="NEMA NU 2-2012 / NU 2-2018 PET image-quality (IEC body phantom) analysis in one offline HTML file: sphere contrast, background variability, lung residual and a printable report.">
+<meta property="og:title" content="NEMA IQ Analyzer – independent PET image-quality QA">
+<meta property="og:description" content="Vendor-neutral NEMA NU 2 image-quality analysis that runs in the browser. Try it with the demo dataset.">
+<meta property="og:image" content="https://yirmish.github.io/NEMA_IQ_Analyzer/docs/social_preview.png">
+<meta property="og:url" content="https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <style id="appCss">
   .btn.small { padding: 3px 9px; font-size: 12px; margin-left: 6px; } #profInfo, #refInfo, #limInfo, #baseInfo { margin-top: 3px; }
   .custom { margin-top: 6px; display: grid; gap: 4px; } .custom .k2 { display: inline-block; width: 120px; color: #444; } .custom input { width: 330px; }
@@ -29,6 +36,7 @@
   .hint { font-size: 12px; color: #5a6470; }
   .btn { display: inline-block; padding: 7px 14px; margin: 4px; border-radius: 4px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; font-size: 14px; }
   .btn.secondary { background: #fff; color: var(--blue); }
+  .btn.demo { background: #0f7b6c; border-color: #0f7b6c; } .demorow { margin-top: 10px !important; }
   .btn.primary { font-size: 15px; padding: 9px 26px; }
   .btn:disabled { opacity: .45; cursor: default; }
   .form { display: grid; grid-template-columns: 250px 1fr; gap: 8px 14px; align-items: center; font-size: 14px; }
@@ -94,12 +102,14 @@
   <section class="panel" id="p-data">
     <h2>1 · DICOM data</h2>
     <div id="drop" class="drop">
-      <p>Drag the DICOM study folder here, or</p>
+      <p>Drag the DICOM study folder (or a .zip of it) here, or</p>
       <label class="btn">Select DICOM folder…<input type="file" id="dirInput" webkitdirectory directory multiple hidden></label>
       <label class="btn secondary">Select files…<input type="file" id="fileInput" multiple hidden></label>
+      <p class="demorow">No data at hand? <button type="button" class="btn demo" id="demoBtn">Load demo dataset</button>
+        <span class="hint">digital IEC phantom, NU 2-2012 fill, lung insert, 3 replicates (4.4 MB): downloaded from the project website and analysed automatically</span></p>
       <p class="hint">For security reasons a browser cannot open a typed path: click <i>Select DICOM folder</i> and navigate to the study folder
         (the exported study folder). The folder may contain the PET replicates and the CT; sub-folders are read too.
-        Supported: uncompressed DICOM (Explicit/Implicit VR).</p>
+        Supported: uncompressed DICOM (Explicit/Implicit VR), also inside .zip files.</p>
     </div>
     <div id="seriesBox"></div>
   </section>

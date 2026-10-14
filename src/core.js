@@ -6,7 +6,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.2';
+N.VERSION = '2.0.3';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
@@ -303,6 +303,59 @@ function headerInfo(ds) {
   };
 }
 N.headerInfo = headerInfo;
+
+// ---------------------------------------------------------------- ZIP archives (zipped PACS exports, demo dataset)
+/* Minimal ZIP reader: stored (0) and deflated (8) entries; no encryption, no ZIP64. Deflate uses the built-in
+   DecompressionStream('deflate-raw') of current browsers (and Node.js >= 18). Returns [{name, data: Uint8Array}]. */
+async function inflateRaw(u8) {
+  if (typeof DecompressionStream === 'undefined') throw new Error('this browser cannot unpack ZIP files; unpack the ZIP and select the folder instead');
+  const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter();
+  const wr = w.write(u8).then(() => w.close());
+  const rd = ds.readable.getReader(), parts = []; let n = 0;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); n += value.length; }
+  await wr;
+  const out = new Uint8Array(n); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+N.unzip = async function (buf) {
+  const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf), dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let e = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error('not a ZIP file (end of central directory not found)');
+  const n = dv.getUint16(e + 10, true); let p = dv.getUint32(e + 16, true);
+  if (n === 0xffff || p === 0xffffffff) throw new Error('ZIP64 archives are not supported; unpack the ZIP and select the folder instead');
+  const out = [], dec = new TextDecoder();
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('corrupt ZIP file (central directory)');
+    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
+    const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nl)); p += 46 + nl + xl + cl;
+    if (name.endsWith('/')) continue;
+    if (flags & 1) throw new Error(`ZIP entry ${name} is encrypted (not supported)`);
+    if (dv.getUint32(off, true) !== 0x04034b50) throw new Error('corrupt ZIP file (local header)');
+    const start = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), raw = u8.subarray(start, start + csize);
+    const data = method === 0 ? raw.slice() : method === 8 ? await inflateRaw(raw) : null;
+    if (!data) throw new Error(`ZIP entry ${name}: compression method ${method} is not supported`);
+    if (data.length !== usize) throw new Error(`ZIP entry ${name}: size mismatch`);
+    out.push({ name, data });
+  }
+  return out;
+};
+// File-like object over bytes in memory (the interface used by N.scanFiles)
+N.memFile = (name, data) => ({ name, size: data.length, slice: (a, b) => ({ arrayBuffer: async () => data.slice(a, b).buffer }),
+                               arrayBuffer: async () => data.slice().buffer });
+// Replace the .zip files of a file list by their entries (ZIPs inside ZIPs are not opened)
+N.expandZips = async function (files, log) {
+  const out = [];
+  for (const f of files) {
+    if (!/\.zip$/i.test(f.name || '')) { out.push(f); continue; }
+    const ents = await N.unzip(new Uint8Array(await f.arrayBuffer()));
+    for (const z of ents) out.push(N.memFile(z.name.split('/').pop(), z.data));
+    if (log) log.info(`${f.name}: ${ents.length} files unpacked`);
+  }
+  return out;
+};
 
 // Scan File-like objects ({name, size, slice(a,b).arrayBuffer(), arrayBuffer()}) and group by series
 N.scanFiles = async function (files, log, progress) {

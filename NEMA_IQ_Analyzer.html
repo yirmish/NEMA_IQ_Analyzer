@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  NEMA IQ Analyzer v2.0.2 - offline analysis of the NEMA NU 2 PET image-quality test.
+  NEMA IQ Analyzer v2.0.3 - offline analysis of the NEMA NU 2 PET image-quality test.
   Copyright (c) 2026 The NEMA IQ Analyzer authors. Released under the MIT License (see LICENSE in the source repository).
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. Not a medical device.
 -->
@@ -9,6 +9,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NEMA IQ Analyzer</title>
+<meta name="description" content="NEMA NU 2-2012 / NU 2-2018 PET image-quality (IEC body phantom) analysis in one offline HTML file: sphere contrast, background variability, lung residual and a printable report.">
+<meta property="og:title" content="NEMA IQ Analyzer – independent PET image-quality QA">
+<meta property="og:description" content="Vendor-neutral NEMA NU 2 image-quality analysis that runs in the browser. Try it with the demo dataset.">
+<meta property="og:image" content="https://yirmish.github.io/NEMA_IQ_Analyzer/docs/social_preview.png">
+<meta property="og:url" content="https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <style id="appCss">
   .btn.small { padding: 3px 9px; font-size: 12px; margin-left: 6px; } #profInfo, #refInfo, #limInfo, #baseInfo { margin-top: 3px; }
   .custom { margin-top: 6px; display: grid; gap: 4px; } .custom .k2 { display: inline-block; width: 120px; color: #444; } .custom input { width: 330px; }
@@ -29,6 +36,7 @@
   .hint { font-size: 12px; color: #5a6470; }
   .btn { display: inline-block; padding: 7px 14px; margin: 4px; border-radius: 4px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; font-size: 14px; }
   .btn.secondary { background: #fff; color: var(--blue); }
+  .btn.demo { background: #0f7b6c; border-color: #0f7b6c; } .demorow { margin-top: 10px !important; }
   .btn.primary { font-size: 15px; padding: 9px 26px; }
   .btn:disabled { opacity: .45; cursor: default; }
   .form { display: grid; grid-template-columns: 250px 1fr; gap: 8px 14px; align-items: center; font-size: 14px; }
@@ -94,12 +102,14 @@
   <section class="panel" id="p-data">
     <h2>1 · DICOM data</h2>
     <div id="drop" class="drop">
-      <p>Drag the DICOM study folder here, or</p>
+      <p>Drag the DICOM study folder (or a .zip of it) here, or</p>
       <label class="btn">Select DICOM folder…<input type="file" id="dirInput" webkitdirectory directory multiple hidden></label>
       <label class="btn secondary">Select files…<input type="file" id="fileInput" multiple hidden></label>
+      <p class="demorow">No data at hand? <button type="button" class="btn demo" id="demoBtn">Load demo dataset</button>
+        <span class="hint">digital IEC phantom, NU 2-2012 fill, lung insert, 3 replicates (4.4 MB): downloaded from the project website and analysed automatically</span></p>
       <p class="hint">For security reasons a browser cannot open a typed path: click <i>Select DICOM folder</i> and navigate to the study folder
         (the exported study folder). The folder may contain the PET replicates and the CT; sub-folders are read too.
-        Supported: uncompressed DICOM (Explicit/Implicit VR).</p>
+        Supported: uncompressed DICOM (Explicit/Implicit VR), also inside .zip files.</p>
     </div>
     <div id="seriesBox"></div>
   </section>
@@ -163,7 +173,7 @@
     <div id="report"></div>
   </section>
 </main>
-<footer class="app">NEMA IQ Analyzer v2.0.2 · analysis per NEMA NU 2 Sec. 7 (image quality, accuracy of attenuation and scatter corrections) · for QA use by qualified medical physicists ·
+<footer class="app">NEMA IQ Analyzer v2.0.3 · analysis per NEMA NU 2 Sec. 7 (image quality, accuracy of attenuation and scatter corrections) · for QA use by qualified medical physicists ·
   <b>Not a medical device.</b> Provided without warranty; verify results and follow the manufacturer's test procedure and acceptance criteria.
   · © 2026 The NEMA IQ Analyzer authors · MIT License</footer>
 <script>// generated from scanner_profiles.json by build.py - edit the JSON, not this file
@@ -1650,7 +1660,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.2';
+N.VERSION = '2.0.3';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
@@ -1947,6 +1957,59 @@ function headerInfo(ds) {
   };
 }
 N.headerInfo = headerInfo;
+
+// ---------------------------------------------------------------- ZIP archives (zipped PACS exports, demo dataset)
+/* Minimal ZIP reader: stored (0) and deflated (8) entries; no encryption, no ZIP64. Deflate uses the built-in
+   DecompressionStream('deflate-raw') of current browsers (and Node.js >= 18). Returns [{name, data: Uint8Array}]. */
+async function inflateRaw(u8) {
+  if (typeof DecompressionStream === 'undefined') throw new Error('this browser cannot unpack ZIP files; unpack the ZIP and select the folder instead');
+  const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter();
+  const wr = w.write(u8).then(() => w.close());
+  const rd = ds.readable.getReader(), parts = []; let n = 0;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); n += value.length; }
+  await wr;
+  const out = new Uint8Array(n); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+N.unzip = async function (buf) {
+  const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf), dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let e = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error('not a ZIP file (end of central directory not found)');
+  const n = dv.getUint16(e + 10, true); let p = dv.getUint32(e + 16, true);
+  if (n === 0xffff || p === 0xffffffff) throw new Error('ZIP64 archives are not supported; unpack the ZIP and select the folder instead');
+  const out = [], dec = new TextDecoder();
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('corrupt ZIP file (central directory)');
+    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
+    const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nl)); p += 46 + nl + xl + cl;
+    if (name.endsWith('/')) continue;
+    if (flags & 1) throw new Error(`ZIP entry ${name} is encrypted (not supported)`);
+    if (dv.getUint32(off, true) !== 0x04034b50) throw new Error('corrupt ZIP file (local header)');
+    const start = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), raw = u8.subarray(start, start + csize);
+    const data = method === 0 ? raw.slice() : method === 8 ? await inflateRaw(raw) : null;
+    if (!data) throw new Error(`ZIP entry ${name}: compression method ${method} is not supported`);
+    if (data.length !== usize) throw new Error(`ZIP entry ${name}: size mismatch`);
+    out.push({ name, data });
+  }
+  return out;
+};
+// File-like object over bytes in memory (the interface used by N.scanFiles)
+N.memFile = (name, data) => ({ name, size: data.length, slice: (a, b) => ({ arrayBuffer: async () => data.slice(a, b).buffer }),
+                               arrayBuffer: async () => data.slice().buffer });
+// Replace the .zip files of a file list by their entries (ZIPs inside ZIPs are not opened)
+N.expandZips = async function (files, log) {
+  const out = [];
+  for (const f of files) {
+    if (!/\.zip$/i.test(f.name || '')) { out.push(f); continue; }
+    const ents = await N.unzip(new Uint8Array(await f.arrayBuffer()));
+    for (const z of ents) out.push(N.memFile(z.name.split('/').pop(), z.data));
+    if (log) log.info(`${f.name}: ${ents.length} files unpacked`);
+  }
+  return out;
+};
 
 // Scan File-like objects ({name, size, slice(a,b).arrayBuffer(), arrayBuffer()}) and group by series
 N.scanFiles = async function (files, log, progress) {
@@ -3477,6 +3540,7 @@ async function setFiles(list, name) {
   const log = new N.Log(logLine);
   $('runBtn').disabled = true;
   try {
+    if (files.some(f => /\.zip$/i.test(f.name || ''))) { await progress(0.02, 'Unpacking ZIP'); files = await N.expandZips(files, log); }
     groups = await N.scanFiles(files, log, progress);
     await progress(1, `${files.length} files read`);
     renderSeries();
@@ -3658,6 +3722,41 @@ $('htmlBtn').addEventListener('click', () => {
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>NEMA IQ report ${tag()}</title><style>${css}</style></head><body class="standalone">${$('report').innerHTML}</body></html>`;
   download(`NEMA_IQ_report_${tag()}.html`, html, 'text/html');
 });
+
+// ---------------------------------------------------------------- demo dataset (digital phantom, loaded from the project website; ?demo=1)
+const DEMO_URL = 'demo/NEMA_IQ_demo_digital_phantom.zip', DEMO_PAGE = 'https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html?demo=1';
+async function fetchBytes(url, msg) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  const len = +r.headers.get('content-length') || 0;
+  if (!r.body || !r.body.getReader || !len) return new Uint8Array(await r.arrayBuffer());
+  const rd = r.body.getReader(), parts = []; let n = 0;
+  for (;;) {
+    const { done, value } = await rd.read(); if (done) break;
+    parts.push(value); n += value.length; await progress(0.3 * n / len, `${msg} ${(n / 1e6).toFixed(1)} of ${(len / 1e6).toFixed(1)} MB`);
+  }
+  const out = new Uint8Array(n); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+async function loadDemo() {
+  $('err').hidden = true;
+  if (location.protocol === 'file:') {
+    showError(`the demo dataset is loaded from the project website, which a local file cannot do. Open ${DEMO_PAGE} — or download ${DEMO_URL} from the GitHub repository and drag the ZIP file onto this page.`);
+    return;
+  }
+  $('demoBtn').disabled = true;
+  try {
+    const bytes = await fetchBytes(DEMO_URL, 'Downloading the demo dataset');
+    const r12 = document.querySelector('input[name=std][value="2012"]'); r12.checked = true; r12.dispatchEvent(new Event('change'));
+    if (!$('site').value.trim()) $('site').value = 'Demo: digital IEC phantom (tests/digital_phantom.py)';
+    await setFiles([N.memFile('NEMA_IQ_demo_digital_phantom.zip', bytes)], 'Demo dataset: digital IEC phantom, NU 2-2012 fill, lung insert, 3 replicates');
+    if ($('err').hidden) await run();
+  } catch (e) { showError(e); document.body.dataset.done = 'error'; }
+  $('demoBtn').disabled = false;
+}
+$('demoBtn').addEventListener('click', loadDemo);
+if (new URLSearchParams(location.search).has('demo')) loadDemo();
 
 // ---------------------------------------------------------------- automated test hook (?autotest=manifest.json&std=2018)
 (async function autotest() {

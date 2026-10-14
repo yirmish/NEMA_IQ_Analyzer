@@ -34,6 +34,7 @@ async function setFiles(list, name) {
   const log = new N.Log(logLine);
   $('runBtn').disabled = true;
   try {
+    if (files.some(f => /\.zip$/i.test(f.name || ''))) { await progress(0.02, 'Unpacking ZIP'); files = await N.expandZips(files, log); }
     groups = await N.scanFiles(files, log, progress);
     await progress(1, `${files.length} files read`);
     renderSeries();
@@ -215,6 +216,41 @@ $('htmlBtn').addEventListener('click', () => {
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>NEMA IQ report ${tag()}</title><style>${css}</style></head><body class="standalone">${$('report').innerHTML}</body></html>`;
   download(`NEMA_IQ_report_${tag()}.html`, html, 'text/html');
 });
+
+// ---------------------------------------------------------------- demo dataset (digital phantom, loaded from the project website; ?demo=1)
+const DEMO_URL = 'demo/NEMA_IQ_demo_digital_phantom.zip', DEMO_PAGE = 'https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html?demo=1';
+async function fetchBytes(url, msg) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  const len = +r.headers.get('content-length') || 0;
+  if (!r.body || !r.body.getReader || !len) return new Uint8Array(await r.arrayBuffer());
+  const rd = r.body.getReader(), parts = []; let n = 0;
+  for (;;) {
+    const { done, value } = await rd.read(); if (done) break;
+    parts.push(value); n += value.length; await progress(0.3 * n / len, `${msg} ${(n / 1e6).toFixed(1)} of ${(len / 1e6).toFixed(1)} MB`);
+  }
+  const out = new Uint8Array(n); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+async function loadDemo() {
+  $('err').hidden = true;
+  if (location.protocol === 'file:') {
+    showError(`the demo dataset is loaded from the project website, which a local file cannot do. Open ${DEMO_PAGE} — or download ${DEMO_URL} from the GitHub repository and drag the ZIP file onto this page.`);
+    return;
+  }
+  $('demoBtn').disabled = true;
+  try {
+    const bytes = await fetchBytes(DEMO_URL, 'Downloading the demo dataset');
+    const r12 = document.querySelector('input[name=std][value="2012"]'); r12.checked = true; r12.dispatchEvent(new Event('change'));
+    if (!$('site').value.trim()) $('site').value = 'Demo: digital IEC phantom (tests/digital_phantom.py)';
+    await setFiles([N.memFile('NEMA_IQ_demo_digital_phantom.zip', bytes)], 'Demo dataset: digital IEC phantom, NU 2-2012 fill, lung insert, 3 replicates');
+    if ($('err').hidden) await run();
+  } catch (e) { showError(e); document.body.dataset.done = 'error'; }
+  $('demoBtn').disabled = false;
+}
+$('demoBtn').addEventListener('click', loadDemo);
+if (new URLSearchParams(location.search).has('demo')) loadDemo();
 
 // ---------------------------------------------------------------- automated test hook (?autotest=manifest.json&std=2018)
 (async function autotest() {
