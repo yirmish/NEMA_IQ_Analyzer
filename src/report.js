@@ -296,7 +296,7 @@ ${m0.GE.pre_inj_activity_MBq != null ? ` (pre ${(+m0.GE.pre_inj_activity_MBq).to
     ['Tilt / axial spread', `${g.lung_present ? 'lung axis' : 'body axis'} ${f(g.lung_tilt_deg, 2)}°, sphere centres ${f(g.sphere_z_spread_mm, 1)} mm`],
     ['Background ROIs', `margin ${f(bi.margin_mm, 1)} mm (NEMA 15), wall gap ${f(Math.min(...bi.wall_gap_mm), 1)}–${f(Math.max(...bi.wall_gap_mm), 1)} mm, sphere gap ≥ ${f(Math.min(...bi.sphere_gap_mm), 1)} mm, spacing ${f(bi.min_spacing_mm, 1)} mm`],
     ['Background slices', res.rois.bgSlices.join(', ') + ' (' + res.rois.bgSlices.map(k => sgn((k - g.iz0) * res.dz, 1)).join(', ') + ' mm)'],
-    ['Lung slices', g.lung_present ? `${res.rois.lungSlices[0]}–${res.rois.lungSlices[res.rois.lungSlices.length - 1]} (n = ${res.rois.lungSlices.length}); insert ${f(g.lung_z[0], 1)}–${f(g.lung_z[1], 1)}; exclusion ${res.std.lungExcl} mm`
+    ['Lung slices', g.lung_present ? `${res.rois.lungSlices[0]}–${res.rois.lungSlices[res.rois.lungSlices.length - 1]} (n = ${res.rois.lungSlices.length}); insert ${f(g.lung_z[0], 1)}–${f(g.lung_z[1], 1)}; exclusion ${N.lungRuleText(res.rois.lungInfo, res.std)}`
                                   : 'no lung insert detected: lung residual not measured; ring centre and body axis used for localisation']]);
   const warn = res.log.warnings.length ? '<ul class="warn">' + res.log.warnings.map(w => `<li>${esc(w)}</li>`).join('') + '</ul>' : '<div class="small">none</div>';
   const stdCmp = `<table class="t small"><thead><tr><th></th><th>NEMA NU 2-2012</th><th>NEMA NU 2-2018</th></tr></thead><tbody>

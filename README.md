@@ -32,6 +32,12 @@ phantom (no patient or site data) with `python docs/make_example.py`, which runs
    * *NEMA standard*: NU 2-2018 (all six spheres hot; lung slices within 30 mm of the insert ends excluded) or
      NU 2-2012 (10–22 mm hot, 28/37 mm cold; 10 mm exclusion). Choose the edition your acceptance protocol uses.
    * *Sphere : background ratio*: the true activity-concentration ratio of the fill (nominal 4.00).
+   * *Sphere ROI slice*: one common slice through the sphere plane (default; as in the standard; matches the GE
+     NEMA software) or the central slice of each sphere (for a tilted phantom).
+   * *Lung-residual slices*: the exclusion (10 / 30 mm) is applied at the ends of the lung insert (default; matches the GE
+     NEMA software). Where the insert continues beyond the axial FOV, slices up to the FOV edge are used; the second
+     option excludes slices near the FOV edge as well (2.0.1 behaviour). An exclusion distance other than the standard's
+     can be entered; the report then warns.
    * *Scanner profile* (optional): auto-detected from the DICOM header, or chosen from the list. A profile identifies the
      system and may provide **published reference values** that are shown for comparison. They are never used as limits.
    * *Acceptance limits*: none (results without PASS/FAIL), entered by hand, or loaded from a JSON file. Take the values
@@ -44,11 +50,12 @@ phantom (no patient or site data) with `python docs/make_example.py`, which runs
 
 * **Localisation (automatic):** phantom body, lung insert (axis and tilt) or, if the phantom has no lung insert, the sphere
   ring and body axis; sphere plane; the six spheres on the 57.2 mm ring, identified by size; hot/cold type of each sphere
-  (checked against the selected edition). Each sphere ROI is placed on that sphere's own central slice (or one common slice).
+  (checked against the selected edition). All sphere ROIs are placed on one common slice through the sphere plane
+  (optionally each on its own central slice).
 * **ROIs:** sphere ROIs with the sphere inner diameter; 12 background ROIs of each diameter on 5 slices (0, ±1, ±2 cm).
   The NEMA 15 mm wall/sphere margin is reduced in 0.5 mm steps when 12 non-overlapping 37 mm ROIs do not fit; the report
   says so. The wall is located with sub-pixel precision (50 % of the background in the smoothed image). Lung ROI 30 mm on
-  every slice outside the exclusion zone. ROI means use fractional (sub-pixel) weights.
+  every slice outside the exclusion zone at the insert ends. ROI means use fractional (sub-pixel) weights.
 * **Formulas:** Q<sub>H</sub> = (C<sub>H</sub>/C<sub>B</sub> − 1)/(a<sub>H</sub>/a<sub>B</sub> − 1) × 100;
   Q<sub>C</sub> = (1 − C<sub>C</sub>/C<sub>B</sub>) × 100; BV = SD/C<sub>B</sub> × 100 over 60 ROIs (K − 1);
   lung error = C<sub>lung</sub>/C<sub>B,37</sub> × 100, averaged over slices; results are the mean (± SD) over replicates.
@@ -64,6 +71,14 @@ phantom (no patient or site data) with `python docs/make_example.py`, which runs
   ROIs of 37 mm (12 ROIs × 5 slices), following the definition of C<sub>B</sub> in the standard. Because the formula is
   written with a slice index (C<sub>B,i</sub>), some implementations use a per-slice background instead; results from
   other software may therefore differ slightly. Compare like with like.
+* **Lung-residual slices:** the exclusion zone (NU 2-2012: 10 mm, NU 2-2018: 30 mm) is measured from the ends of the lung
+  insert. On systems whose axial FOV is shorter than the phantom (e.g. 15-20 cm), the insert usually continues beyond the
+  first or last image slice; that end of the slice range is the FOV edge, not an insert end, and by default no slices are
+  excluded there. The slices at the FOV edge have low sensitivity and add scan-to-scan variation; the *fov-edge* option
+  excludes them (2.0.0/2.0.1 behaviour). With the whole insert inside the FOV both options give the same result.
+* **Sphere ROI slice:** by default all sphere ROIs lie on the slice nearest the sphere plane (median of the six sphere
+  centres). With a tilted phantom the sphere centres may round to different slices; the per-sphere option then places each
+  ROI on its own central slice, which gives slightly higher contrast for the spheres that are off the common slice.
 * **Replicates:** results are the mean (± SD) over the replicate acquisitions of the same reconstruction. Different
   reconstructions of the same acquisition are never averaged. With a single acquisition no SD is given.
 * **Sphere type:** hot/cold is measured from the images. If the fill does not match the selected edition (e.g. 28/37 mm
@@ -139,10 +154,14 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
   sphere set (10–37 mm, 57.2 mm ring).
 * Published reference values depend on acquisition, reconstruction and phantom preparation, and are no substitute for
   acceptance limits. Values marked *provisional* come from secondary sources.
-* Validation so far: clinical phantom data from two GE systems (Omni Legend 32 cm, NU 2-2012-type fill with lung
-  insert, 3 replicates; Discovery MI 4-ring, no lung insert, 2 reconstructions). The analysis agrees with an independent
+* Validation so far: clinical phantom data from GE systems (Omni Legend 32 cm, NU 2-2012-type fill with lung insert,
+  3 replicates; Discovery MI 4-ring, no lung insert, 2 reconstructions). The analysis agrees with an independent
   Python implementation (contrast within 0.01 percentage points), and with the manufacturer's IQ tool within −0.6 to
-  +1.3 points when the manufacturer's slice and ROIs are used. The Siemens and Philips DICOM conventions (units, scale
+  +1.3 points when the manufacturer's slice and ROIs are used. Against results of the GE NEMA software for a Discovery MI
+  (20 cm) and a Discovery MI DR (15 cm), NU 2-2012 fill, 3 scans each, with the default settings of 2.0.2: hot-sphere
+  contrast within 3.7 points per scan (GE's own scan-to-scan SD 3.3) and 0.8 points for the 3-scan mean; cold-sphere
+  contrast within 0.4 points; background variability bias +0.1 points (95 % limits −1.9 to +2.1; the background ROIs
+  are placed independently of GE's); lung residual within 0.16 points. Hot-sphere contrast used the nominal 4.00 ratio. The Siemens and Philips DICOM conventions (units, scale
   factors, decay correction, model names) were implemented from the conformance statements and tested on modified
   copies of GE images only. The analysis is also verified on digital phantoms with known ground truth (see *Tests*),
   which test the software, not the behaviour of a real scanner. **Test the program on your own data before routine use.**
@@ -165,13 +184,16 @@ digital IEC body phantoms as PET DICOM (`tests/digital_phantom.py`), analyses th
 * **Truth:** sphere identification, hot/cold type, sphere centres, phantom tilt, background concentration, decay
   correction, units and measured/expected activity against the known values; contrast against a sphere ROI centred on
   the true sphere centre.
-* **Rules:** each sphere ROI on the slice nearest its centre; 12 background ROIs at the required distance from wall,
-  spheres and lung insert on the central slice and at ±10 and ±20 mm; lung-residual slices outside the exclusion zone of
-  the selected edition.
+* **Rules:** all sphere ROIs on the slice nearest the sphere plane (or, per-sphere option, each on the slice nearest its
+  centre); 12 background ROIs at the required distance from wall, spheres and lung insert on the central slice and at
+  ±10 and ±20 mm; lung-residual slices outside the exclusion zone of the selected edition at the insert ends, and up to
+  the FOV edge where the insert continues beyond it (or excluded there with the *fov-edge* option).
 
 The cases cover NU 2-2012 and 2018 fills, 4:1 and 8:1, with and without lung insert, tilt, offset and rotation, reversed
-sphere order, 1.65-4 mm voxels, noise, replicates, decay correction START and ADMIN, Philips CNTS units, Implicit VR
-files and a series without spheres (must be refused). The digital phantom has no sphere walls and uses Gaussian noise
+sphere order, both sphere-slice modes, 1.65-4 mm voxels, a 15.7 cm and a 22 cm axial FOV (lung insert leaving the FOV or
+completely inside it, both lung-slice options), noise, replicates, decay correction START and ADMIN, Philips CNTS units,
+Implicit VR files and a series without spheres (must be refused). `--jobs 1` runs the cases one after the other without
+worker processes. The digital phantom has no sphere walls and uses Gaussian noise
 instead of reconstructed noise.
 
 GitHub Actions (`.github/workflows/tests.yml`) runs these tests on every push and pull request, and checks that

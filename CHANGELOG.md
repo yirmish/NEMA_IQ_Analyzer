@@ -1,5 +1,39 @@
 # Changelog
 
+## 2.0.2 — 2026-10-14
+
+Defaults changed after a comparison with results of the GE NEMA software (Discovery MI 20 cm and Discovery MI DR 15 cm,
+NU 2-2012 fill, 3 scans each). Contrast and background variability are otherwise computed exactly as in 2.0.1.
+
+### Analysis
+- Sphere ROIs: **one common slice through the sphere plane is now the default** (as in NEMA NU 2, where the sphere ROIs
+  are drawn on the transverse slice centred on the spheres; this also reproduces the GE NEMA software). 2.0.0/2.0.1 placed each sphere
+  ROI on its own central slice by default; this remains available (*Central slice of each sphere*, `sliceMode:
+  'per-sphere'`). Where the sphere centres span 2.7 mm axially, per-sphere slices put three spheres on the next slice and
+  single-scan contrast differed from GE by up to 11.9 points; with one common slice by at most 3.7 points (hot) and
+  0.4 points (cold), comparable to GE's own scan-to-scan SD (3.3 points). Results change only where the sphere
+  centres round to different slices (e.g. GE Omni Legend, 2026 test: 28/37 mm cold contrast +0.4/−1.7 points, hot
+  spheres unchanged).
+- Lung residual: new option *Lung-residual slices* (`lungRange`). **Default `'insert-ends'`**: the 10 / 30 mm exclusion
+  applies at the ends of the lung insert only; where the insert continues beyond the first or last image slice (axial
+  FOV shorter than the phantom), slices up to the FOV edge are used. 2.0.0/2.0.1 applied the exclusion at the FOV edge as
+  well (`'fov-edge'`, still selectable). With the new default the lung residual agrees with GE within 0.16 points per
+  scan (2.0.1: bias −0.7, up to 2.0 points) and shows the same scan-to-scan variation. No change when the whole insert is
+  inside the FOV (e.g. 32 cm Omni Legend).
+- Optional lung exclusion distance (`lungExclMm`); a value other than the standard's gives a warning.
+- Report: the lung-slices row states the exclusion rule that was applied; the JSON export lists the new options.
+
+### Tests
+- The rule check follows the sphere-slice mode and the lung-slice rule. New cases: `tilt3_offset_common`,
+  `short_fov_2012`, `short_fov_2012_fov_edge` (15.7 cm FOV, insert leaving the FOV) and `long_fov_full_insert` (13 cases).
+  With the 2.0.1 core, `short_fov_2012` fails (lung slices excluded at the FOV edge).
+- `tests/analyse.js` takes optional sphere-slice mode, lung-slice rule and exclusion arguments (default: program
+  defaults). `run_tests.py --jobs 1` runs serially without worker processes.
+
+### Documentation
+- README: new settings, calculation conventions and the comparison with the GE NEMA software.
+- Example report in `docs/` regenerated with 2.0.2 (one common sphere slice; lung slices up to the FOV edge).
+
 ## 2.0.1 — 2026-10-14
 
 ### Analysis
