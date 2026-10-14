@@ -107,7 +107,7 @@ out += [f"| {d} | {u} |" for d, u in LOGIC_SOURCES]
 out += ["", "# Sources of the built-in scanner profiles", "",
         "Generated from `scanner_profiles.json` by `make_sources.py`. Published values are shown in the report for "
         "**comparison only**; they are not acceptance limits. Values were copied from the cited table or text of each "
-        "source; entries marked *provisional* come from a secondary source.", ""]
+        "source; entries marked *provisional* come from a secondary source or could not be checked against the final publication.", ""]
 out += [profile_md(p) for p in db["profiles"]]
 out += ["## Not found in public sources (at compilation)", ""] + [f"- {s}" for s in NOT_FOUND] + [""]
 dst = os.path.join(root, "SOURCES.md")

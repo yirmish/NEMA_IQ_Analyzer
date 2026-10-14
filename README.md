@@ -127,7 +127,8 @@ resolution and noise. It contains no patient, site or scanner data; `truth.json`
 Profiles are optional. They identify a system from the DICOM header (Manufacturer, Manufacturer's Model Name and, for GE,
 the axial FOV) and may contain a published acquisition/reconstruction protocol and published reference values. The
 reference values are shown for comparison (purple markers and a Δ column) and are **never** used as PASS/FAIL limits,
-except the Discovery IQ "prescribed limits" quoted by Jha et al. 2019, which can be selected explicitly as limits.
+except the Discovery IQ "prescribed limits" quoted by Jha et al. 2019 and the Omni Legend 32 cm specification quoted by
+Smith et al. 2024, which can be selected explicitly as limits.
 
 | Profile | Auto-detection | Published reference | Remarks |
 |---|---|---|---|
@@ -142,9 +143,11 @@ except the Discovery IQ "prescribed limits" quoted by Jha et al. 2019, which can
 | GE Discovery MI, 5 rings | `Discovery MI` + axial FOV | Pan 2019; Zeimpekis 2022 (Gen 2, NU 2-2018) | protocol: Zeimpekis 2022 |
 | GE Discovery MI, 6 rings | `Discovery MI` + axial FOV | Zeimpekis 2022 (Gen 2, NU 2-2018) | protocol: Zeimpekis 2022 |
 | GE Discovery MI DR | `Discovery MI DR` | none found | protocol: Chicheportiche 2020 |
+| GE Omni Legend, 16 / 21 cm | `Omni Legend` + axial FOV | none found | identification only |
+| GE Omni Legend, 32 cm | `Omni Legend` + axial FOV | Smith 2024 (NU 2-2018; VPHD, Q.Clear, Precision DL; preprint values, provisional) | protocol: Smith 2024; optional published limits (GE specification quoted by Smith 2024) |
 
-For the Discovery MI the ring variant is chosen from the GE private axial-FOV tag; if that tag is absent all four
-variants are offered and the profile must be selected by hand.
+For the Discovery MI and the Omni Legend the variant is chosen from the GE private axial-FOV tag; if that tag is absent
+all variants are offered and the profile must be selected by hand.
 
 Sources, details and the status of every value are listed in `SOURCES.md`. Additional profiles (other systems, your own
 protocol) can be written with `templates/profile_template.json` and loaded with *Load profile JSON…*, or added to
@@ -176,7 +179,8 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
 * One bed position containing the phantom is expected; the phantom must be the IEC/NEMA body phantom with the standard
   sphere set (10–37 mm, 57.2 mm ring).
 * Published reference values depend on acquisition, reconstruction and phantom preparation, and are no substitute for
-  acceptance limits. Values marked *provisional* come from secondary sources.
+  acceptance limits. Values marked *provisional* come from secondary sources or could not be checked against the final
+publication.
 * Validation so far: clinical phantom data from GE systems (Omni Legend 32 cm, NU 2-2012-type fill with lung insert,
   3 replicates; Discovery MI 4-ring, no lung insert, 2 reconstructions). The analysis agrees with an independent
   Python implementation (contrast within 0.01 percentage points), and with the manufacturer's IQ tool within −0.6 to

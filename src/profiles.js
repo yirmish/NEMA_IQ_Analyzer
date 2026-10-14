@@ -2,8 +2,8 @@
 (function (G) { G.NEMA_PROFILES = {
 "meta": {
 "title": "NEMA IQ Analyzer - built-in scanner profiles",
-"version": "2026-09-25",
-"note": "Profiles identify the scanner and carry PUBLISHED NEMA NU 2 image-quality values for comparison. They are not acceptance limits. Every value is copied from the cited source (table/figure given); entries marked 'provisional' come from secondary sources. Published limit sets (where a manufacturer specification has been published) are offered only as an explicit choice.",
+"version": "2026-10-14",
+"note": "Profiles identify the scanner and carry PUBLISHED NEMA NU 2 image-quality values for comparison. They are not acceptance limits. Every value is copied from the cited source (table/figure given); entries marked 'provisional' come from secondary sources or could not be checked against the final publication. Published limit sets (where a manufacturer specification has been published) are offered only as an explicit choice.",
 "research": "Compiled from peer-reviewed performance evaluations, public vendor documents and public DICOM metadata (TCIA)."
 },
 "profiles": [
@@ -1470,6 +1470,229 @@
 }
 },
 "references": []
+},
+{
+"id": "ge-omni-legend-16",
+"manufacturer": "GE HealthCare",
+"name": "GE Omni Legend (16 cm)",
+"match": {
+"manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+"model": "Omni\\s*Legend"
+},
+"afov_cm": 16,
+"variant": "16 cm axial FOV (FDA 510(k) K241665)",
+"tof_ps": null,
+"dicom_model_names": [
+"Omni Legend"
+],
+"notes": "Identification only: no published per-sphere NEMA IQ values were found for the 16 cm configuration. It is chosen over the 32 cm profile by the GE axial-FOV tag; the tag value of this configuration has not been checked on real images.",
+"protocol": null,
+"references": [],
+"dicom_model_names_source": "headers of the 32 cm system (assumed the same for this configuration, because the axial FOV is not part of the model name)"
+},
+{
+"id": "ge-omni-legend-21",
+"manufacturer": "GE HealthCare",
+"name": "GE Omni Legend (21 cm)",
+"match": {
+"manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+"model": "Omni\\s*Legend"
+},
+"afov_cm": 21,
+"variant": "21 cm axial FOV (FDA 510(k) K241665)",
+"tof_ps": null,
+"dicom_model_names": [
+"Omni Legend"
+],
+"notes": "Identification only: no published per-sphere NEMA IQ values were found for the 21 cm configuration. It is chosen over the 32 cm profile by the GE axial-FOV tag; the tag value of this configuration has not been checked on real images.",
+"protocol": null,
+"references": [],
+"dicom_model_names_source": "headers of the 32 cm system (assumed the same for this configuration, because the axial FOV is not part of the model name)"
+},
+{
+"id": "ge-omni-legend-32",
+"manufacturer": "GE HealthCare",
+"name": "GE Omni Legend (32 cm)",
+"match": {
+"manufacturer": "^GE\\b|GE MEDICAL|GE HEALTH",
+"model": "Omni\\s*Legend"
+},
+"afov_cm": 32,
+"variant": "32 cm axial FOV (16, 21 and 32 cm configurations exist: FDA 510(k) K241665)",
+"tof_ps": null,
+"dicom_model_names": [
+"Omni Legend"
+],
+"notes": "Digital BGO (SiPM readout), no time of flight. The model name does not encode the axial FOV; the GE private axial-FOV tag (GEMS_PETD_01 0009,xx2C, 317 mm on a 32 cm system) selects between the 16, 21 and 32 cm profiles. References and published limits: Smith et al. 2024, values transcribed from the authors' open preprint (Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. arXiv:2308.06255v1, 2023), Table 5; the peer-reviewed article (CC BY 4.0) could not be retrieved for checking. Its abstract gives the same VPHD range (52.7 +/- 3.2 % at 10 mm to 92.5 +/- 2.4 % at 37 mm, mean of three acquisitions). Yamagishi et al. (J Nucl Med 2023;64:1990-1997, doi 10.2967/jnumed.123.266140) report for Q.Clear beta 50 a contrast of 61.3-93.0 %, background variability 5.4-11.7 % and lung error 5.1 % (abstract; per-sphere table not retrieved).",
+"protocol": {
+"source": "Smith et al. Biomed Phys Eng Express 2024;10:025032 (preprint arXiv:2308.06255, Sec. 2.7): VPHD 384x384, 6 iterations, 22 subsets, 2 mm Gaussian filter; three acquisitions, the first 7 min, the next two prolonged for decay (durations not stated)",
+"scan_time_s": null,
+"replicates": 3,
+"recon": {
+"method": "VPHD",
+"matrix": "384x384",
+"iterations": 6,
+"subsets": 22,
+"filter_mm": 2.0
+}
+},
+"published_limits": [
+{
+"id": "smith2024-ge-spec",
+"name": "GE specification, Omni Legend 32 cm, NU 2-2018 (as reproduced by Smith et al. 2024)",
+"source": "Smith et al. 2024 (doi 10.1088/2057-1976/ad286c), Table 5 'Specified Contrast' / 'Specified Background' / lung error (preprint arXiv:2308.06255 numbering)",
+"standard": "2018",
+"contrast": [
+30,
+40,
+50,
+60,
+60,
+60
+],
+"sphere_types": [
+"hot",
+"hot",
+"hot",
+"hot",
+"hot",
+"hot"
+],
+"bv": [
+12,
+10,
+9,
+7,
+6,
+5
+],
+"lung": 19,
+"notes": "All six spheres hot (NU 2-2018). The table gives the specification beside the VPHD, Q.Clear and PDL results without naming the reconstruction it applies to; the paper's IQ protocol is VPHD 6 it / 22 subsets / 2 mm. Contrast >= and background variability and lung error <= the specified values (table note). Transcribed from the preprint; the same numbers are quoted for the Discovery IQ by Jha et al. 2019."
+}
+],
+"references": [
+{
+"id": "smith2024-vphd",
+"label": "VPHD 6i22s, 2 mm, 4:1 (Smith 2024) - provisional",
+"standard": "NEMA NU 2-2018",
+"variant": "Omni Legend 32 cm (Cardiff)",
+"ratio": 4.0,
+"recon": "VPHD (3D OSEM), 6 iterations x 22 subsets, 2 mm Gaussian filter, 384x384",
+"acquisition": "3 acquisitions, the first 7 min, the next two prolonged to keep the counts constant (exact durations not stated); background 5.3 kBq/mL and spheres 21 kBq/mL 18F at imaging time (4:1), all six spheres hot; scatter phantom 120 MBq; CTAC 120 kVp; ROIs placed by the GE software; contrast is the mean of the three acquisitions",
+"sphere_types": {
+"10": "hot",
+"13": "hot",
+"17": "hot",
+"22": "hot",
+"28": "hot",
+"37": "hot"
+},
+"contrast_pct": {
+"10": 52.7,
+"13": 63.7,
+"17": 76.7,
+"22": 78.8,
+"28": 84.9,
+"37": 92.5
+},
+"bv_pct": {
+"10": 8.7,
+"13": 6.8,
+"17": 5.3,
+"22": 4.2,
+"28": 3.1,
+"37": 2.5
+},
+"lung_residual_pct": 11.4,
+"citation": "Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032",
+"doi": "https://doi.org/10.1088/2057-1976/ad286c",
+"table": "Table 5 (preprint numbering)",
+"notes": "Provisional: values transcribed from the authors' open preprint (Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. arXiv:2308.06255v1, 2023), Table 5; the peer-reviewed article (CC BY 4.0) could not be retrieved for checking. Its abstract gives the same VPHD range (52.7 +/- 3.2 % at 10 mm to 92.5 +/- 2.4 % at 37 mm, mean of three acquisitions). Lung error measured in the 50 mm lung insert.",
+"provisional": true,
+"default": true
+},
+{
+"id": "smith2024-qclear500",
+"label": "Q.Clear beta 500, 4:1 (Smith 2024) - provisional",
+"standard": "NEMA NU 2-2018",
+"variant": "Omni Legend 32 cm (Cardiff)",
+"ratio": 4.0,
+"recon": "Q.Clear (BSREM), beta 500",
+"acquisition": "3 acquisitions, the first 7 min, the next two prolonged to keep the counts constant (exact durations not stated); background 5.3 kBq/mL and spheres 21 kBq/mL 18F at imaging time (4:1), all six spheres hot; scatter phantom 120 MBq; CTAC 120 kVp; ROIs placed by the GE software; contrast is the mean of the three acquisitions",
+"sphere_types": {
+"10": "hot",
+"13": "hot",
+"17": "hot",
+"22": "hot",
+"28": "hot",
+"37": "hot"
+},
+"contrast_pct": {
+"10": 32.4,
+"13": 52.5,
+"17": 67.9,
+"22": 73.1,
+"28": 85.8,
+"37": 92.5
+},
+"bv_pct": {
+"10": 2.1,
+"13": 1.8,
+"17": 1.6,
+"22": 1.4,
+"28": 1.2,
+"37": 1.0
+},
+"lung_residual_pct": 6.8,
+"citation": "Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032",
+"doi": "https://doi.org/10.1088/2057-1976/ad286c",
+"table": "Table 5 (preprint numbering)",
+"notes": "Provisional: values transcribed from the authors' open preprint (Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. arXiv:2308.06255v1, 2023), Table 5; the peer-reviewed article (CC BY 4.0) could not be retrieved for checking. Its abstract gives the same VPHD range (52.7 +/- 3.2 % at 10 mm to 92.5 +/- 2.4 % at 37 mm, mean of three acquisitions). Lung error measured in the 50 mm lung insert.",
+"provisional": true,
+"default": false
+},
+{
+"id": "smith2024-pdl-medium",
+"label": "Precision DL medium on Q.Clear beta 500, 4:1 (Smith 2024) - provisional",
+"standard": "NEMA NU 2-2018",
+"variant": "Omni Legend 32 cm (Cardiff)",
+"ratio": 4.0,
+"recon": "Precision DL (PDL, medium strength) applied to Q.Clear beta 500 images",
+"acquisition": "3 acquisitions, the first 7 min, the next two prolonged to keep the counts constant (exact durations not stated); background 5.3 kBq/mL and spheres 21 kBq/mL 18F at imaging time (4:1), all six spheres hot; scatter phantom 120 MBq; CTAC 120 kVp; ROIs placed by the GE software; contrast is the mean of the three acquisitions",
+"sphere_types": {
+"10": "hot",
+"13": "hot",
+"17": "hot",
+"22": "hot",
+"28": "hot",
+"37": "hot"
+},
+"contrast_pct": {
+"10": 48.5,
+"13": 62.3,
+"17": 78.6,
+"22": 74.4,
+"28": 89.1,
+"37": 96.5
+},
+"bv_pct": {
+"10": 2.9,
+"13": 2.6,
+"17": 2.4,
+"22": 2.4,
+"28": 2.3,
+"37": 2.2
+},
+"lung_residual_pct": 2.6,
+"citation": "Smith RL, Bartley L, O'Callaghan C, Haberska L, Marshall C. NEMA NU 2-2018 evaluation and image quality optimization of a new generation digital 32-cm axial field-of-view Omni Legend PET-CT using a genetic evolutionary algorithm. Biomed Phys Eng Express. 2024;10(2):025032",
+"doi": "https://doi.org/10.1088/2057-1976/ad286c",
+"table": "Table 5 (preprint numbering)",
+"notes": "Provisional: values transcribed from the authors' open preprint (Smith RL, Bartley L, O'Callaghan C, Bradley KM, Marshall C. arXiv:2308.06255v1, 2023), Table 5; the peer-reviewed article (CC BY 4.0) could not be retrieved for checking. Its abstract gives the same VPHD range (52.7 +/- 3.2 % at 10 mm to 92.5 +/- 2.4 % at 37 mm, mean of three acquisitions). Lung error measured in the 50 mm lung insert.",
+"provisional": true,
+"default": false
+}
+],
+"dicom_model_names_source": "PET DICOM headers of an Omni Legend 32 cm system (software pet_omni.42; no public Omni Legend DICOM found)"
 }
 ]
 }; })(typeof globalThis !== 'undefined' ? globalThis : this);

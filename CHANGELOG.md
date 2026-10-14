@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.5 — 2026-10-14
+
+The analysis is unchanged; results are identical to 2.0.4.
+
+### Scanner profiles
+- New profiles for the **GE Omni Legend** (14 profiles in total). The variant (16, 21 or 32 cm axial FOV; FDA 510(k)
+  K241665) is chosen from the GE axial-FOV tag, as for the Discovery MI (317 mm on a 32 cm system).
+- Omni Legend 32 cm: protocol VPHD 384 × 384, 6 iterations, 22 subsets, 2 mm filter, 3 acquisitions; published reference
+  values for VPHD, Q.Clear β 500 and Precision DL (medium) and, as an optional limit set, the GE specification
+  (contrast ≥ 30/40/50/60/60/60 %, background variability ≤ 12/10/9/7/6/5 %, lung error ≤ 19 %; NU 2-2018, all spheres
+  hot), all from Smith et al., Biomed Phys Eng Express 2024;10:025032. The values are transcribed from the authors'
+  open preprint (arXiv:2308.06255) and marked provisional until checked against the published table.
+- Omni Legend 16 and 21 cm: identification only (no published per-sphere values found).
+- "Provisional" now means a secondary source or a value not yet checked against the final publication (warning, report
+  and `SOURCES.md` wording).
+
 ## 2.0.4 — 2026-10-14
 
 Packaging release: the program and the analysis are unchanged (results identical to 2.0.2 and 2.0.3).
