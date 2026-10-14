@@ -1,8 +1,9 @@
 name: release
 
-# Creates the tag v<version> and a GitHub release with NEMA_IQ_Analyzer.html and SHA256SUMS.txt, after the tests pass
-# and the version and release date agree in src/core.js, NEMA_IQ_Analyzer.html, CITATION.cff and CHANGELOG.md.
-# Start it from the Actions tab on main (version x.y.z), or push the tag vx.y.z.
+# Creates the tag v<version> and a GitHub release with NEMA_IQ_Analyzer.html, SHA256SUMS.txt and the demo dataset
+# (demo/NEMA_IQ_demo_digital_phantom.zip), after the tests pass and the version and release date agree in src/core.js,
+# NEMA_IQ_Analyzer.html, CITATION.cff and CHANGELOG.md. Start it from the Actions tab on main (version x.y.z), or push
+# the tag vx.y.z. Run again for a version that is already released, it adds the missing files (taken from the tag).
 on:
   workflow_dispatch:
     inputs:
@@ -41,11 +42,30 @@ jobs:
           grep -qx "date-released: \"$date\"" CITATION.cff || fail "CITATION.cff: date-released is not $date (CHANGELOG.md)"
           echo "VERSION=$v" >> "$GITHUB_ENV"
       - name: Release notes from CHANGELOG.md
-        run: awk -v h="## $VERSION " 'index($0, h) == 1 {f = 1; next} f && /^## / {exit} f' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-      - name: Create tag and release
+        run: |
+          site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/NEMA_IQ_Analyzer.html"
+          { echo "**Try it online:** <$site?demo=1>  "
+            echo "**Demo dataset:** \`NEMA_IQ_demo_digital_phantom.zip\` (attached; digital IEC phantom as PET DICOM, no patient or site data). Drag it onto \`NEMA_IQ_Analyzer.html\` and choose NU 2-2012."
+            echo
+            awk -v h="## $VERSION " 'index($0, h) == 1 {f = 1; next} f && /^## / {exit} f' CHANGELOG.md; } > "$RUNNER_TEMP/notes.md"
+      - name: Create tag and release, or add missing files to an existing release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then target=(--target "$GITHUB_SHA"); else target=(--verify-tag); fi
-          gh release create "v$VERSION" NEMA_IQ_Analyzer.html SHA256SUMS.txt "${target[@]}" \
-            --title "NEMA IQ Analyzer $VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+          assets=(NEMA_IQ_Analyzer.html SHA256SUMS.txt demo/NEMA_IQ_demo_digital_phantom.zip)
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            git fetch --depth=1 origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
+            have=$(gh release view "v$VERSION" --json assets --jq '.assets[].name')
+            mkdir -p "$RUNNER_TEMP/assets"
+            for f in "${assets[@]}"; do
+              n=$(basename "$f")
+              if grep -qxF "$n" <<< "$have"; then echo "$n: already attached"; continue; fi
+              git show "v$VERSION:$f" > "$RUNNER_TEMP/assets/$n" || { echo "::error::$f is not in tag v$VERSION"; exit 1; }
+              gh release upload "v$VERSION" "$RUNNER_TEMP/assets/$n"
+              echo "$n: attached"
+            done
+          else
+            if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then target=(--target "$GITHUB_SHA"); else target=(--verify-tag); fi
+            gh release create "v$VERSION" "${assets[@]}" "${target[@]}" \
+              --title "NEMA IQ Analyzer $VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+          fi

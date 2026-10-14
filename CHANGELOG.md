@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Repository
+- The release workflow also attaches `demo/NEMA_IQ_demo_digital_phantom.zip` and starts the notes with the links to
+  the online demo. Run again for a released version, it adds the files that are missing from that release.
+
 ## 2.0.3 — 2026-10-14
 
 The analysis is unchanged; results are identical to 2.0.2.
