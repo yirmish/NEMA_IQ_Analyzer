@@ -26,6 +26,9 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from digital_phantom import make_phantom  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, '..', 'demo'))
+from make_demo import PHANTOM as DEMO_PHANTOM  # noqa: E402
+DEMO_ZIP = os.path.join(HERE, '..', 'demo', 'NEMA_IQ_demo_digital_phantom.zip')
 
 SPHERE_D = [10, 13, 17, 22, 28, 37]
 
@@ -70,6 +73,8 @@ CASES = [
          lung_range='fov-edge', warnings=[]),
     dict(name='long_fov_full_insert', desc='22 cm axial FOV, whole phantom inside the FOV (exclusion at both insert ends), noise',
          phantom=dict(nz=110, zoff=20.0, fwhm=6, noise=0.10, lung_act=0.05, seed=19), tol=NOISY, warnings=[]),
+    dict(name='demo_dataset', desc='the online demo: demo/NEMA_IQ_demo_digital_phantom.zip, read with the program\'s ZIP reader (same phantom regenerated for the checks)',
+         phantom=DEMO_PHANTOM, zip=DEMO_ZIP, standard='2012', tol=NOISY, warnings=[]),
     dict(name='no_spheres', desc='spheres filled like the background: the program must refuse the series',
          phantom=dict(ratio=1.0, fwhm=6, noise=0.05, seed=17), error='No NEMA IEC body-phantom sphere pattern'),
 ]
@@ -166,7 +171,8 @@ def run_case(case, workdir):
     out = os.path.join(d, 'result.json')
     node = shutil.which('node') or 'node'
     slice_mode, lung_range = case.get('slice_mode', 'common'), case.get('lung_range', 'insert-ends')
-    p = subprocess.run([node, os.path.join(HERE, 'analyse.js'), d, out, std, str(ratio), slice_mode, lung_range], capture_output=True, text=True)
+    src = case.get('zip') or d          # demo case: analyse the committed ZIP; the regenerated phantom provides the truth
+    p = subprocess.run([node, os.path.join(HERE, 'analyse.js'), src, out, std, str(ratio), slice_mode, lung_range], capture_output=True, text=True)
     fails, info = [], {}
 
     def check(ok, msg):

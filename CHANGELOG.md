@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.0.3 — 2026-10-14
+
+The analysis is unchanged; results are identical to 2.0.2.
+
+### Demo dataset
+- New `demo/NEMA_IQ_demo_digital_phantom.zip` (4.4 MB): a digital IEC body phantom written as PET DICOM by
+  `tests/digital_phantom.py` (NU 2-2012 fill, lung insert, 3 replicates, 2.5 mm voxels; no patient, site or scanner
+  data). `python demo/make_demo.py` regenerates it byte for byte.
+- Button *Load demo dataset* (section 1) and the address `NEMA_IQ_Analyzer.html?demo=1` on the project website download
+  the ZIP, select NU 2-2012 and run the analysis. This is the only network access of the program and happens only on
+  request. In a local copy (`file://`) the button explains how to load the ZIP by drag and drop instead.
+
+### Input
+- ZIP files can be dragged onto the page or chosen with *Select files…*; their DICOM entries are read in memory (stored or
+  deflated entries; ZIP64 and encrypted ZIPs are refused with a message). `tests/analyse.js` accepts a ZIP as well.
+
+### Repository
+- `docs/social_preview.png` (1280 × 640, repository card for GitHub and link previews; `docs/make_social_preview.py`)
+  and Open Graph / Twitter meta tags in the HTML head.
+- `index.html` redirects the project website to the program and keeps `?demo=1`; it is now covered by `SHA256SUMS.txt`.
+- Test case `demo_dataset` analyses the demo ZIP (14 cases).
+
 ## 2.0.2 — 2026-10-14
 
 Defaults changed after a comparison with results of the GE NEMA software (Discovery MI 20 cm and Discovery MI DR 15 cm,

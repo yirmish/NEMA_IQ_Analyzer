@@ -7,6 +7,8 @@ A single, self-contained HTML file (`NEMA_IQ_Analyzer.html`) for the analysis of
 - Runs locally in the browser (Chrome, Edge, Firefox). No installation, no internet connection, no external libraries.
 - No data leave the computer: DICOM files are read and processed in the browser's memory.
 - Produces a printable A4 report (PDF via the browser's print dialog) plus CSV/JSON/HTML exports.
+- **Try it with one click:** [open the program with the demo dataset](https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html?demo=1). A digital IEC phantom (no
+  patient or site data) is downloaded and analysed, and the full report appears within seconds (see *Demo dataset*).
 
 > **Not a medical device.** This software is provided for quality-assurance work by qualified medical physicists, without
 > warranty of any kind. Verify the results, and follow the manufacturer's test procedure and acceptance criteria.
@@ -21,10 +23,29 @@ An example report is in [`docs/example_report.pdf`](docs/example_report.pdf). It
 phantom (no patient or site data) with `python docs/make_example.py`, which runs the program in a headless browser.
 `SHA256SUMS.txt` lists the checksums of all files of the release.
 
+## Demo dataset
+
+[`demo/NEMA_IQ_demo_digital_phantom.zip`](demo/NEMA_IQ_demo_digital_phantom.zip) (4.4 MB) is a synthetic NEMA NU 2
+image-quality study written by `tests/digital_phantom.py`: IEC body phantom with the NU 2-2012 fill (10–22 mm spheres
+hot at 4:1, 28/37 mm cold), lung insert, three replicate acquisitions, 160 × 160 × 80 voxels of 2.5 mm, 6.5 mm
+resolution and noise. It contains no patient, site or scanner data; `truth.json` in the ZIP gives the true geometry.
+
+* **Online, one click:** <https://yirmish.github.io/NEMA_IQ_Analyzer/NEMA_IQ_Analyzer.html?demo=1> downloads the ZIP, selects NU 2-2012
+  and runs the analysis. The button *Load demo dataset* in section 1 of the page does the same.
+* **Offline:** download the ZIP, drag it onto the opened `NEMA_IQ_Analyzer.html` (or use *Select files…*), choose
+  NU 2-2012 and click *Analyse*. The button cannot load the demo into a local copy: browsers do not let a `file://` page
+  read other files.
+* The demo button (or `?demo` in the address) is the only function that uses the network, and only to download this
+  ZIP from the project website. Your own DICOM data are never sent anywhere.
+* `python demo/make_demo.py` regenerates the ZIP byte for byte (fixed parameters, seed, UIDs and time stamps). The test
+  suite analyses it (case `demo_dataset`).
+
 ## Quick start
 
 1. Open `NEMA_IQ_Analyzer.html` (double-click).
 2. **1 · DICOM data** — click *Select DICOM folder…* and choose the exported study folder, or drag the folder onto the page.
+   A ZIP file of the export can be dragged onto the page or chosen with *Select files…* (standard ZIP, stored or
+   deflated; not ZIP64 or encrypted).
    Browsers do not accept a typed path. Sub-folders are read. The series table lists every series. Attenuation-corrected
    PET series of one reconstruction are ticked as replicates. When a study contains several reconstructions of the same
    acquisitions, choose one in *Reconstruction*; run again with another choice for the next report.
@@ -134,13 +155,15 @@ protocol) can be written with `templates/profile_template.json` and loaded with 
 | File | Purpose |
 |---|---|
 | `NEMA_IQ_Analyzer.html` | the program (everything inlined) |
+| `index.html` | redirect of the project website to the program |
 | `scanner_profiles.json` | built-in scanner profiles with sources (editable; rebuild to include changes) |
 | `templates/limits_template.json` | acceptance-limit file format |
 | `templates/baseline_template.json` | baseline file format (normally created by the program) |
 | `templates/profile_template.json` | format for additional scanner profiles (load with *Load profile JSON…*) |
 | `SOURCES.md` | the documents behind the analysis rules and the published sources of every profile value |
 | `src/` | source code: `core.js` (DICOM reader and analysis), `report.js` (report), `ui.js` (interface), `template.html`, `profiles.js` (generated), `build.py`, `make_sources.py`, `test_core.js` |
-| `docs/` | example report (PDF) and page images of a digital phantom; `make_example.py` / `render_example.js` regenerate them |
+| `demo/` | demo dataset (digital phantom, ZIP of PET DICOM) and `make_demo.py`, which regenerates it |
+| `docs/` | example report (PDF) and page images of a digital phantom; `make_example.py` / `render_example.js` regenerate them; `social_preview.png` (repository card, `make_social_preview.py`) |
 | `tests/` | verification on digital phantoms with known ground truth (see *Tests*) |
 | `.github/workflows/` | `tests.yml`: rebuild and checksum check, digital-phantom tests; `release.yml`: tag and GitHub release |
 | `CHANGELOG.md`, `LICENSE`, `CITATION.cff` | release notes, MIT licence, citation metadata |
@@ -192,7 +215,7 @@ digital IEC body phantoms as PET DICOM (`tests/digital_phantom.py`), analyses th
 The cases cover NU 2-2012 and 2018 fills, 4:1 and 8:1, with and without lung insert, tilt, offset and rotation, reversed
 sphere order, both sphere-slice modes, 1.65-4 mm voxels, a 15.7 cm and a 22 cm axial FOV (lung insert leaving the FOV or
 completely inside it, both lung-slice options), noise, replicates, decay correction START and ADMIN, Philips CNTS units,
-Implicit VR files and a series without spheres (must be refused). `--jobs 1` runs the cases one after the other without
+Implicit VR files, a series without spheres (must be refused) and the demo dataset, read from its ZIP file. `--jobs 1` runs the cases one after the other without
 worker processes. The digital phantom has no sphere walls and uses Gaussian noise
 instead of reconstructed noise.
 

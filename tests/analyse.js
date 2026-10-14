@@ -1,6 +1,6 @@
 // Analyses a DICOM folder with the program's analysis core and writes the full result as JSON: summary, sphere centres,
 // ROI positions, per-replicate measurements and warnings, or {ok: false, error} if the analysis stops. Used by run_tests.py.
-// Usage: node analyse.js <DICOM folder> <out.json> [2012|2018] [sphere:background ratio] [common|per-sphere] [insert-ends|fov-edge]
+// Usage: node analyse.js <DICOM folder or .zip> <out.json> [2012|2018] [sphere:background ratio] [common|per-sphere] [insert-ends|fov-edge]
 //        [lung exclusion mm]   (omitted options: the program defaults)
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -21,7 +21,9 @@ const pick = (o, keys) => Object.fromEntries(keys.map(k => [k, o[k] === undefine
   const log = new N.Log();
   let res;
   try {
-    const groups = await N.scanFiles(walk(root).filter(p => p.endsWith('.dcm')).map(fileShim), log);
+    const files = /\.zip$/i.test(root) ? await N.expandZips([N.memFile(path.basename(root), new Uint8Array(fs.readFileSync(root)))], log)   // the program's ZIP reader
+                                        : walk(root).filter(p => p.endsWith('.dcm')).map(fileShim);
+    const groups = await N.scanFiles(files, log);
     res = await N.run(groups, { standard, ratio: +ratio, profileId: 'auto', sliceMode, lungRange, lungExclMm: lungExcl === '' ? null : +lungExcl, sphereTypes: 'detected', baseline: null }, log);
   } catch (e) {
     fs.writeFileSync(out, JSON.stringify({ ok: false, error: e.message, warnings: log.warnings }));
