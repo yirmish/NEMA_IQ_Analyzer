@@ -1,5 +1,7 @@
 # NEMA IQ Analyzer
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24213590.svg)](https://doi.org/10.5281/zenodo.24213590)
+
 A single, self-contained HTML file (`NEMA_IQ_Analyzer.html`) for the analysis of the **NEMA NU 2 Image Quality test**
 (IEC/NEMA body phantom: sphere contrast, background variability, lung residual) from PET DICOM images, according to
 **NEMA NU 2-2012** or **NEMA NU 2-2018**.
@@ -256,4 +258,6 @@ Manufacturer and product names are trademarks of their respective owners.
 
 ## Citation
 
-Citation metadata are in [`CITATION.cff`](CITATION.cff).
+Citation metadata are in [`CITATION.cff`](CITATION.cff). Releases from 2.0.6 on are archived on Zenodo; to cite the
+program regardless of version, use [doi:10.5281/zenodo.24213590](https://doi.org/10.5281/zenodo.24213590), which always
+resolves to the latest release.
