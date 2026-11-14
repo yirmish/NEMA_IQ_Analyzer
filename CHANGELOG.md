@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.6 — 2026-11-14
+
+The analysis is unchanged; results are identical to 2.0.5.
+
+### Release
+- First release archived on Zenodo, which assigns it a DOI so the program can be cited.
+- `CITATION.cff` names the author (Yirmiyahu Shachor) instead of "The NEMA IQ Analyzer authors".
+
 ## 2.0.5 — 2026-10-14
 
 The analysis is unchanged; results are identical to 2.0.4.

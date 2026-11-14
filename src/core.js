@@ -6,7 +6,7 @@
 (function (G) {
 'use strict';
 const N = {};
-N.VERSION = '2.0.5';
+N.VERSION = '2.0.6';
 
 // ------------------------------------------------------------------ constants
 const SPHERE_D = [10, 13, 17, 22, 28, 37];          // inner diameters [mm]
